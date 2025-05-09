@@ -2,18 +2,22 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, Heart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/ui/logo";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useCart } from "@/context/cart-context";
+import { useWishlist } from "@/context/wishlist-context";
 
 export function Navbar() {
   const isMobile = useIsMobile();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  const { itemCount: cartItemCount } = useCart();
+  const { itemCount: wishlistItemCount } = useWishlist();
   
   React.useEffect(() => {
     const handleScroll = () => {
@@ -127,12 +131,27 @@ export function Navbar() {
             <User className="h-5 w-5" />
           </Button>
           
-          <Button size="icon" variant="ghost" className="relative">
-            <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-gold text-xs font-medium text-noir-900 flex items-center justify-center">
-              0
-            </span>
-          </Button>
+          <Link to="/wishlist">
+            <Button size="icon" variant="ghost" className="relative">
+              <Heart className="h-5 w-5" />
+              {wishlistItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-gold text-xs font-medium text-noir-900 flex items-center justify-center">
+                  {wishlistItemCount}
+                </span>
+              )}
+            </Button>
+          </Link>
+          
+          <Link to="/cart">
+            <Button size="icon" variant="ghost" className="relative">
+              <ShoppingCart className="h-5 w-5" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-gold text-xs font-medium text-noir-900 flex items-center justify-center">
+                  {cartItemCount}
+                </span>
+              )}
+            </Button>
+          </Link>
         </div>
       </div>
     </motion.header>

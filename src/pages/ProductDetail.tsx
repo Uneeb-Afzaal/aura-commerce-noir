@@ -1,399 +1,372 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useParams, Link } from "react-router-dom";
+import { Heart, ShoppingBag, Minus, Plus, Star, ChevronRight } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, Minus, Plus, Share2, ShoppingCart, Star, Truck } from "lucide-react";
-
-// Mock product data
-const product = {
-  id: "1",
-  name: "Oud Noir Intense",
-  brand: "AURA",
-  price: 215,
-  description: "An intense and captivating fragrance that combines rare oud wood with spicy notes of cardamom and saffron. The heart reveals a bouquet of Bulgarian rose and geranium, while the base notes of amber, sandalwood, and vanilla create a warm, lingering finish.",
-  rating: 4.8,
-  reviews: 124,
-  images: [
-    "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1595425970377-c9393ee12689?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1608528577891-eb055944f2e7?auto=format&fit=crop&w=800&q=80"
-  ],
-  details: {
-    concentration: "Eau de Parfum",
-    size: "100ml",
-    topNotes: "Cardamom, Saffron, Bergamot",
-    heartNotes: "Bulgarian Rose, Geranium, Jasmine",
-    baseNotes: "Oud Wood, Amber, Sandalwood, Vanilla",
-    longevity: "Long-lasting (8-10 hours)",
-    sillage: "Strong",
-  },
-  inStock: true
-};
-
-// Mock reviews
-const reviews = [
-  {
-    id: "r1",
-    author: "James Wilson",
-    date: "March 15, 2023",
-    rating: 5,
-    content: "This is the most sophisticated fragrance I've ever owned. The oud and saffron combination is divine, and the longevity is exceptional. Worth every penny."
-  },
-  {
-    id: "r2",
-    author: "Sophia Martinez",
-    date: "February 28, 2023",
-    rating: 4,
-    content: "Beautiful fragrance with excellent projection and longevity. The only reason I'm giving it 4 stars instead of 5 is that it's quite intense for everyday wear."
-  },
-  {
-    id: "r3",
-    author: "Michael Thompson",
-    date: "January 12, 2023",
-    rating: 5,
-    content: "This has become my signature scent. I receive compliments every time I wear it. The dry down is absolutely stunning."
-  }
-];
+import { Product } from "@/types";
+import { getProductById } from "@/lib/product-service";
+import { useCart } from "@/context/cart-context";
+import { useWishlist } from "@/context/wishlist-context";
 
 const ProductDetail = () => {
-  const [selectedImage, setSelectedImage] = useState(0);
+  const { id } = useParams<{ id: string }>();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const { addItem } = useCart();
+  const { addItem: addToWishlist, isInWishlist, removeItem: removeFromWishlist } = useWishlist();
   
-  const increaseQuantity = () => setQuantity((prev) => prev + 1);
-  const decreaseQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+  useEffect(() => {
+    if (id) {
+      setIsLoading(true);
+      getProductById(id)
+        .then((data) => {
+          if (data) {
+            setProduct(data);
+          }
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching product:", error);
+          setIsLoading(false);
+        });
+    }
+  }, [id]);
+
+  const handleAddToCart = () => {
+    if (product) {
+      addItem(product, quantity);
+    }
+  };
+
+  const handleToggleWishlist = () => {
+    if (product) {
+      if (isInWishlist(product.id)) {
+        removeFromWishlist(product.id);
+      } else {
+        addToWishlist(product);
+      }
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-noir-900 text-foreground flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-noir-900 text-foreground">
+        <Navbar />
+        <div className="container mx-auto px-4 pt-32 pb-16 text-center">
+          <h1 className="text-3xl mb-4">Product Not Found</h1>
+          <p className="mb-8">The product you are looking for doesn't exist.</p>
+          <Link to="/shop">
+            <Button className="bg-gold hover:bg-gold-dark text-noir-900">
+              Back to Shop
+            </Button>
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-noir-900 text-foreground">
       <Navbar />
       
-      <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-            {/* Image Gallery */}
-            <div>
-              <motion.div 
-                className="aspect-square overflow-hidden bg-noir-800 rounded-lg mb-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <img
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </motion.div>
-              
-              <div className="flex gap-4">
-                {product.images.map((image, index) => (
-                  <button
-                    key={index}
-                    className={`w-24 h-24 rounded-md overflow-hidden bg-noir-800 ${
-                      selectedImage === index
-                        ? "ring-2 ring-gold"
-                        : "opacity-70 hover:opacity-100"
-                    }`}
-                    onClick={() => setSelectedImage(index)}
-                  >
-                    <img
-                      src={image}
-                      alt={`${product.name} - View ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
+      <main className="container mx-auto px-4 pt-32 pb-16">
+        {/* Breadcrumbs */}
+        <nav className="flex mb-8 text-sm">
+          <Link to="/" className="text-noir-400 hover:text-gold">Home</Link>
+          <ChevronRight className="h-4 w-4 mx-2 text-noir-500" />
+          <Link to="/shop" className="text-noir-400 hover:text-gold">Shop</Link>
+          <ChevronRight className="h-4 w-4 mx-2 text-noir-500" />
+          <span className="text-foreground">{product.name}</span>
+        </nav>
+        
+        <div className="grid lg:grid-cols-2 gap-12">
+          {/* Product Image */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="bg-noir-800 rounded-lg overflow-hidden">
+              <img 
+                src={product.imageUrl}
+                alt={product.name}
+                className="w-full h-[500px] object-cover"
+              />
+            </div>
+          </motion.div>
+          
+          {/* Product Details */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="mb-2">
+              <span className="text-noir-400 text-sm">{product.brand}</span>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-light mb-4">{product.name}</h1>
+            
+            {/* Rating */}
+            <div className="flex items-center mb-6">
+              <div className="flex mr-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-4 w-4 ${i < product.rating ? "fill-gold text-gold" : "text-noir-600"}`}
+                  />
                 ))}
+              </div>
+              <span className="text-sm text-noir-300">
+                ({product.rating} rating)
+              </span>
+            </div>
+            
+            {/* Price */}
+            <div className="mb-8">
+              <span className="text-2xl text-gold">${product.price.toFixed(2)}</span>
+            </div>
+            
+            {/* Description */}
+            <p className="text-noir-200 mb-8">
+              {product.description}
+            </p>
+            
+            {/* Stock Status */}
+            <div className="mb-6">
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                product.stock > 0 ? "bg-green-900/20 text-green-500" : "bg-red-900/20 text-red-500"
+              }`}>
+                {product.stock > 0 ? `In Stock (${product.stock} available)` : "Out of Stock"}
+              </span>
+            </div>
+            
+            {/* Quantity Selector */}
+            <div className="mb-8">
+              <label className="block text-sm mb-2">Quantity</label>
+              <div className="flex items-center">
+                <Button 
+                  size="icon"
+                  variant="outline"
+                  className="h-10 w-10 rounded-l-md border-r-0"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={quantity <= 1}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                
+                <div className="h-10 px-4 flex items-center justify-center min-w-[50px] border border-input bg-background">
+                  {quantity}
+                </div>
+                
+                <Button 
+                  size="icon"
+                  variant="outline"
+                  className="h-10 w-10 rounded-r-md border-l-0"
+                  onClick={() => setQuantity(quantity + 1)}
+                  disabled={quantity >= product.stock}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
               </div>
             </div>
             
-            {/* Product Info */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <div className="mb-1">
-                <h2 className="text-sm uppercase tracking-wider text-gold mb-2">
-                  {product.brand}
-                </h2>
-                <h1 className="text-3xl md:text-4xl font-light mb-2">{product.name}</h1>
-                
-                <div className="flex items-center mb-4">
-                  <div className="flex items-center mr-2">
-                    {Array(5).fill(0).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${
-                          i < Math.floor(product.rating)
-                            ? "text-gold fill-gold"
-                            : "text-noir-500"
-                        }`}
-                      />
-                    ))}
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-4">
+              <Button 
+                className="flex-1 bg-gold hover:bg-gold-dark text-noir-900"
+                onClick={handleAddToCart}
+                disabled={product.stock <= 0}
+              >
+                <ShoppingBag className="h-4 w-4 mr-2" />
+                Add to Cart
+              </Button>
+              
+              <Button
+                variant="outline"
+                className={`min-w-[150px] ${
+                  isInWishlist(product.id) 
+                    ? "bg-gold/10 border-gold text-gold" 
+                    : ""
+                }`}
+                onClick={handleToggleWishlist}
+              >
+                <Heart className={`h-4 w-4 mr-2 ${isInWishlist(product.id) ? "fill-gold" : ""}`} />
+                {isInWishlist(product.id) ? "Wishlisted" : "Add to Wishlist"}
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+        
+        {/* Product Tabs */}
+        <div className="mt-16">
+          <Tabs defaultValue="details">
+            <TabsList className="w-full border-b border-noir-700 bg-transparent">
+              <TabsTrigger value="details" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-gold">
+                Details
+              </TabsTrigger>
+              <TabsTrigger value="ingredients" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-gold">
+                Ingredients
+              </TabsTrigger>
+              <TabsTrigger value="reviews" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-gold">
+                Reviews
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="details" className="py-6">
+              <div className="space-y-4">
+                <p>
+                  Indulge in the captivating allure of {product.name}, a fragrance that combines artistry and luxury. 
+                  This exquisite perfume opens with a blend of fresh top notes that give way to a heart of rich, complex middle notes.
+                </p>
+                <p>
+                  The base notes create a lasting impression that lingers on the skin, creating a personal signature that evolves throughout the day.
+                  Crafted by master perfumers using only the finest ingredients, this fragrance is a testament to the art of perfumery.
+                </p>
+                <div className="grid md:grid-cols-2 gap-4 pt-4">
+                  <div>
+                    <h3 className="font-medium mb-2">Features</h3>
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-noir-200">
+                      <li>Long-lasting fragrance (8-12 hours)</li>
+                      <li>Made with sustainable ingredients</li>
+                      <li>Cruelty-free formulation</li>
+                      <li>Elegant glass bottle with gold accents</li>
+                      <li>Versatile for both day and evening wear</li>
+                    </ul>
                   </div>
-                  <span className="text-sm text-noir-200">{product.rating} ({product.reviews} reviews)</span>
-                </div>
-                
-                <div className="text-2xl mb-6">${product.price.toFixed(2)}</div>
-                
-                <p className="text-noir-100 mb-8">{product.description}</p>
-                
-                <div className="mb-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm text-noir-200">Availability:</span>
-                    <span className={product.inStock ? "text-green-500" : "text-red-500"}>
-                      {product.inStock ? "In Stock" : "Out of Stock"}
-                    </span>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-6 mb-6">
-                    <div className="flex items-center border border-noir-700 rounded-md">
-                      <button
-                        onClick={decreaseQuantity}
-                        className="px-3 py-2 hover:bg-noir-800 transition-colors"
-                      >
-                        <Minus className="h-4 w-4" />
-                      </button>
-                      <span className="px-4 py-2 border-x border-noir-700 min-w-[50px] text-center">
-                        {quantity}
-                      </span>
-                      <button
-                        onClick={increaseQuantity}
-                        className="px-3 py-2 hover:bg-noir-800 transition-colors"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </button>
+                  <div>
+                    <h3 className="font-medium mb-2">Specifications</h3>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <span className="text-noir-400">Volume:</span>
+                      <span>50ml / 1.7 fl oz</span>
+                      <span className="text-noir-400">Concentration:</span>
+                      <span>Eau de Parfum</span>
+                      <span className="text-noir-400">Family:</span>
+                      <span>Oriental Woody</span>
+                      <span className="text-noir-400">Origin:</span>
+                      <span>France</span>
                     </div>
-                    
-                    <Button className="bg-gold hover:bg-gold-dark text-noir-900 flex-grow px-8">
-                      <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
-                    </Button>
-                    
-                    <Button variant="outline" size="icon" className="border-noir-700 hover:bg-noir-800">
-                      <Heart className="h-5 w-5" />
-                    </Button>
-                    
-                    <Button variant="outline" size="icon" className="border-noir-700 hover:bg-noir-800">
-                      <Share2 className="h-5 w-5" />
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="space-y-4 pt-4 border-t border-noir-700">
-                  <div className="flex items-center text-sm">
-                    <Truck className="h-4 w-4 mr-2 text-gold" />
-                    <span>Free shipping on orders over $100</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <Star className="h-4 w-4 mr-2 text-gold" />
-                    <span>Earn loyalty points with every purchase</span>
                   </div>
                 </div>
               </div>
-            </motion.div>
-          </div>
-          
-          {/* Product Details Tabs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <Tabs defaultValue="details" className="w-full">
-              <TabsList className="w-full bg-noir-800 border-b border-noir-700 p-0 mb-8 rounded-none space-x-6">
-                <TabsTrigger 
-                  value="details" 
-                  className="py-4 data-[state=active]:border-b-2 data-[state=active]:border-gold data-[state=active]:text-gold rounded-none"
-                >
-                  Product Details
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="reviews" 
-                  className="py-4 data-[state=active]:border-b-2 data-[state=active]:border-gold data-[state=active]:text-gold rounded-none"
-                >
-                  Reviews ({reviews.length})
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="shipping" 
-                  className="py-4 data-[state=active]:border-b-2 data-[state=active]:border-gold data-[state=active]:text-gold rounded-none"
-                >
-                  Shipping & Returns
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="details" className="mt-0">
-                <div className="grid md:grid-cols-2 gap-8">
+            </TabsContent>
+            
+            <TabsContent value="ingredients" className="py-6">
+              <div className="space-y-4">
+                <p>
+                  Our fragrances are crafted with the finest ingredients sourced from around the world. 
+                  We believe in transparency and are proud to share our formulation with our customers.
+                </p>
+                <div className="mt-4">
+                  <h3 className="font-medium mb-2">Ingredient List</h3>
+                  <p className="text-sm text-noir-300">
+                    Alcohol Denat., Parfum (Fragrance), Aqua (Water), Benzyl Salicylate, Linalool, 
+                    Limonene, Coumarin, Citronellol, Geraniol, Benzyl Alcohol, Citral, Eugenol, 
+                    Benzyl Benzoate, Farnesol, Isoeugenol, Cinnamal, Cinnamyl Alcohol.
+                  </p>
+                </div>
+                <div className="grid md:grid-cols-3 gap-6 pt-4">
                   <div>
-                    <h3 className="text-xl mb-4 font-light">Fragrance Details</h3>
-                    <table className="w-full text-sm">
-                      <tbody>
-                        <tr>
-                          <td className="py-2 text-noir-300">Concentration</td>
-                          <td>{product.details.concentration}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2 text-noir-300">Size</td>
-                          <td>{product.details.size}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2 text-noir-300">Top Notes</td>
-                          <td>{product.details.topNotes}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2 text-noir-300">Heart Notes</td>
-                          <td>{product.details.heartNotes}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2 text-noir-300">Base Notes</td>
-                          <td>{product.details.baseNotes}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2 text-noir-300">Longevity</td>
-                          <td>{product.details.longevity}</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2 text-noir-300">Sillage</td>
-                          <td>{product.details.sillage}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <h3 className="font-medium mb-2">Top Notes</h3>
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-noir-200">
+                      <li>Bergamot</li>
+                      <li>Pink Pepper</li>
+                      <li>Elemi</li>
+                    </ul>
                   </div>
-                  
                   <div>
-                    <h3 className="text-xl mb-4 font-light">The Experience</h3>
-                    <p className="text-noir-100 mb-4">
-                      Oud Noir Intense is a bold yet sophisticated fragrance that begins with an enticing blend of spices. The opening notes of cardamom and saffron create an immediate warmth that's complemented by a hint of fresh bergamot.
-                    </p>
-                    <p className="text-noir-100 mb-4">
-                      As the fragrance evolves, the heart notes of Bulgarian rose and jasmine emerge, adding a sumptuous floral dimension without ever becoming overpowering. The geranium adds a subtle green facet that bridges the gap between the spicy opening and the rich base.
-                    </p>
-                    <p className="text-noir-100">
-                      The true character of this composition reveals itself in the base, where precious oud wood is enhanced by creamy sandalwood, sweet vanilla, and amber. This combination creates a long-lasting trail that's both mysterious and inviting.
-                    </p>
+                    <h3 className="font-medium mb-2">Heart Notes</h3>
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-noir-200">
+                      <li>Black Orchid</li>
+                      <li>Jasmine Absolute</li>
+                      <li>Vetiver</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className="font-medium mb-2">Base Notes</h3>
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-noir-200">
+                      <li>Amber</li>
+                      <li>Sandalwood</li>
+                      <li>Musk</li>
+                    </ul>
                   </div>
                 </div>
-              </TabsContent>
-              
-              <TabsContent value="reviews" className="mt-0">
-                <div className="mb-8 pb-8 border-b border-noir-700">
-                  <div className="flex flex-col md:flex-row gap-8 items-start">
-                    <div className="md:w-1/3">
-                      <div className="text-center md:text-left">
-                        <div className="text-4xl font-light mb-2">{product.rating}</div>
-                        <div className="flex items-center justify-center md:justify-start mb-2">
-                          {Array(5).fill(0).map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-5 h-5 ${
-                                i < Math.floor(product.rating)
-                                  ? "text-gold fill-gold"
-                                  : "text-noir-500"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <p className="text-sm text-noir-200">Based on {product.reviews} reviews</p>
-                      </div>
-                    </div>
-                    
-                    <div className="md:w-2/3">
-                      <Button className="w-full md:w-auto bg-gold hover:bg-gold-dark text-noir-900">
-                        Write a Review
-                      </Button>
-                    </div>
-                  </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="reviews" className="py-6">
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium">Customer Reviews</h3>
+                  <Button variant="outline">Write a Review</Button>
                 </div>
                 
-                <div className="space-y-8">
-                  {reviews.map((review) => (
-                    <div key={review.id} className="pb-8 border-b border-noir-700">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium">{review.author}</h4>
-                        <span className="text-sm text-noir-300">{review.date}</span>
+                <div className="bg-noir-800 rounded-lg p-6">
+                  <div className="flex justify-between mb-4">
+                    <div>
+                      <h4 className="font-medium">Amazing Fragrance!</h4>
+                      <div className="flex items-center mt-1">
+                        <div className="flex mr-2">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className="h-3 w-3 fill-gold text-gold" />
+                          ))}
+                        </div>
+                        <span className="text-xs text-noir-400">March 15, 2023</span>
                       </div>
-                      <div className="flex mb-3">
-                        {Array(5).fill(0).map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-4 h-4 ${
-                              i < review.rating
-                                ? "text-gold fill-gold"
-                                : "text-noir-500"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <p className="text-noir-100">{review.content}</p>
                     </div>
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="shipping" className="mt-0">
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div>
-                    <h3 className="text-xl mb-4 font-light">Shipping Information</h3>
-                    <p className="text-noir-100 mb-4">
-                      We offer the following shipping options for all orders:
-                    </p>
-                    <ul className="space-y-3 text-noir-100">
-                      <li className="flex items-start">
-                        <span className="text-gold mr-2">•</span>
-                        <div>
-                          <span className="font-medium">Standard Shipping (3-5 business days):</span> Free on orders over $100, $10 for orders under $100
-                        </div>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-gold mr-2">•</span>
-                        <div>
-                          <span className="font-medium">Express Shipping (1-2 business days):</span> $20
-                        </div>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-gold mr-2">•</span>
-                        <div>
-                          <span className="font-medium">Next Day Delivery:</span> Available for orders placed before 2pm
-                        </div>
-                      </li>
-                    </ul>
-                    <p className="text-noir-300 text-sm mt-4">
-                      Please note that delivery times are estimates and may vary depending on your location.
-                    </p>
+                    <div className="flex items-center text-sm">
+                      <span className="text-noir-400">by</span>
+                      <span className="ml-1 font-medium">Emily S.</span>
+                    </div>
                   </div>
-                  
-                  <div>
-                    <h3 className="text-xl mb-4 font-light">Returns & Refunds</h3>
-                    <p className="text-noir-100 mb-4">
-                      We want you to be completely satisfied with your purchase. If for any reason you are not, we offer a simple returns process:
-                    </p>
-                    <ul className="space-y-3 text-noir-100">
-                      <li className="flex items-start">
-                        <span className="text-gold mr-2">•</span>
-                        <div>
-                          Return unused and unopened products within 30 days of delivery for a full refund
-                        </div>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-gold mr-2">•</span>
-                        <div>
-                          Contact our customer service team to initiate a return
-                        </div>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-gold mr-2">•</span>
-                        <div>
-                          Refunds will be processed within 5-7 business days after we receive your return
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
+                  <p className="text-sm text-noir-200">
+                    This fragrance is absolutely stunning! I receive compliments every time I wear it. 
+                    The longevity is impressive, lasting all day with just a few sprays. The bottle is also 
+                    beautiful and looks elegant on my vanity.
+                  </p>
                 </div>
-              </TabsContent>
-            </Tabs>
-          </motion.div>
+                
+                <div className="bg-noir-800 rounded-lg p-6">
+                  <div className="flex justify-between mb-4">
+                    <div>
+                      <h4 className="font-medium">Long-lasting and Unique</h4>
+                      <div className="flex items-center mt-1">
+                        <div className="flex mr-2">
+                          {[...Array(4)].map((_, i) => (
+                            <Star key={i} className="h-3 w-3 fill-gold text-gold" />
+                          ))}
+                          <Star className="h-3 w-3 text-noir-600" />
+                        </div>
+                        <span className="text-xs text-noir-400">February 28, 2023</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <span className="text-noir-400">by</span>
+                      <span className="ml-1 font-medium">Michael T.</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-noir-200">
+                    I'm very impressed with how long this fragrance lasts. The scent evolves beautifully 
+                    throughout the day. My only critique would be that the opening is a bit strong, but it 
+                    settles into a really pleasant aroma after about 30 minutes.
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
       
