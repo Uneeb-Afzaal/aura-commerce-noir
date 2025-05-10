@@ -156,9 +156,11 @@ const Cart = () => {
                     </div>
                   </div>
                   
-                  <Button className="w-full mt-6 bg-gold hover:bg-gold-dark text-noir-900">
-                    Proceed to Checkout
-                  </Button>
+                  <Link to="/checkout">
+                    <Button className="w-full mt-6 bg-gold hover:bg-gold-dark text-noir-900">
+                      Proceed to Checkout
+                    </Button>
+                  </Link>
                   
                   <div className="mt-4 text-xs text-center text-noir-400">
                     Free shipping on orders over $200

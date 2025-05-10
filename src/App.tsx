@@ -8,6 +8,7 @@ import { CartProvider } from "@/context/cart-context";
 import { WishlistProvider } from "@/context/wishlist-context";
 import { OrderProvider } from "@/context/order-context";
 import { AdminProvider } from "@/context/admin-context";
+import { UserProvider } from "@/context/user-context";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
@@ -22,6 +23,10 @@ import ProductManagement from "./pages/admin/ProductManagement";
 import OrderManagement from "./pages/admin/OrderManagement";
 import CustomerManagement from "./pages/admin/CustomerManagement";
 import PromotionManagement from "./pages/admin/PromotionManagement";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+import Checkout from "./pages/Checkout";
+import OrderTracking from "./pages/OrderTracking";
 
 const queryClient = new QueryClient();
 
@@ -29,37 +34,43 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AdminProvider>
-        <OrderProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/shop" element={<Shop />} />
-                  <Route path="/product/:id" element={<ProductDetail />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/wishlist" element={<Wishlist />} />
-                  <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
-                  
-                  {/* Admin Routes */}
-                  <Route path="/admin/login" element={<AdminLogin />} />
-                  <Route path="/admin" element={<AdminLayout />}>
-                    <Route path="dashboard" element={<AdminDashboard />} />
-                    <Route path="products" element={<ProductManagement />} />
-                    <Route path="orders" element={<OrderManagement />} />
-                    <Route path="customers" element={<CustomerManagement />} />
-                    <Route path="promotions" element={<PromotionManagement />} />
-                  </Route>
-                  
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </WishlistProvider>
-          </CartProvider>
-        </OrderProvider>
+        <UserProvider>
+          <OrderProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/shop" element={<Shop />} />
+                    <Route path="/product/:id" element={<ProductDetail />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/wishlist" element={<Wishlist />} />
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
+                    <Route path="/order-tracking/:id" element={<OrderTracking />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/profile" element={<Profile />} />
+                    
+                    {/* Admin Routes */}
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                    <Route path="/admin" element={<AdminLayout />}>
+                      <Route path="dashboard" element={<AdminDashboard />} />
+                      <Route path="products" element={<ProductManagement />} />
+                      <Route path="orders" element={<OrderManagement />} />
+                      <Route path="customers" element={<CustomerManagement />} />
+                      <Route path="promotions" element={<PromotionManagement />} />
+                    </Route>
+                    
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </BrowserRouter>
+              </WishlistProvider>
+            </CartProvider>
+          </OrderProvider>
+        </UserProvider>
       </AdminProvider>
     </TooltipProvider>
   </QueryClientProvider>

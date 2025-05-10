@@ -58,3 +58,29 @@ export interface Promotion {
   validUntil: string;
   isActive: boolean;
 }
+
+// New type definitions for user account features
+export interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  phone?: string;
+  addresses: Address[];
+  profileImage?: string;
+  orderHistory: string[]; // Array of order IDs
+}
+
+export interface ShippingOption {
+  id: string;
+  name: string;
+  price: number;
+  estimatedDays: number;
+  description: string;
+}
+
+export interface PaymentMethod {
+  id: string;
+  type: 'credit_card' | 'paypal' | 'apple_pay' | 'google_pay';
+  name: string; // Display name like "Visa ending in 1234"
+  icon?: string;
+}
