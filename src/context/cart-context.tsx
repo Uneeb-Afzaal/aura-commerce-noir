@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 interface CartContextType {
   items: CartItem[];
   addItem: (product: Product, quantity?: number) => void;
+  addItems: (items: CartItem[]) => void;  // Add this new method
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -62,6 +63,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  // Add new method to add multiple items at once
+  const addItems = (newItems: CartItem[]) => {
+    setItems((prevItems) => {
+      const updatedItems = [...prevItems];
+      
+      newItems.forEach((newItem) => {
+        const existingItemIndex = updatedItems.findIndex(item => item.id === newItem.id);
+        
+        if (existingItemIndex >= 0) {
+          updatedItems[existingItemIndex] = {
+            ...updatedItems[existingItemIndex],
+            quantity: updatedItems[existingItemIndex].quantity + newItem.quantity
+          };
+        } else {
+          updatedItems.push(newItem);
+        }
+      });
+      
+      return updatedItems;
+    });
+    
+    if (newItems.length > 0) {
+      toast({
+        title: "Items added to cart",
+        description: `${newItems.length} items have been added to your cart.`,
+      });
+    }
+  };
+
   const removeItem = (id: string) => {
     const itemToRemove = items.find(item => item.id === id);
     
@@ -103,6 +133,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const value = {
     items,
     addItem,
+    addItems,  // Include the new method in the context value
     removeItem,
     updateQuantity,
     clearCart,
