@@ -70,7 +70,7 @@ const Wishlist = () => {
                         </Link>
                         <p className="text-sm text-noir-300">{item.brand}</p>
                         <div className="flex justify-between items-center mt-4">
-                          <span className="text-gold">${item.price.toFixed(2)}</span>
+                          <span className="text-gold">PKR {item.price.toFixed(2)}</span>
                           <Button 
                             size="sm"
                             onClick={() => {

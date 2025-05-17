@@ -65,6 +65,7 @@ export interface UserProfile {
   email: string;
   name: string;
   phone?: string;
+  role : string,
   addresses: Address[];
   profileImage?: string;
   orderHistory: string[]; // Array of order IDs
@@ -80,7 +81,7 @@ export interface ShippingOption {
 
 export interface PaymentMethod {
   id: string;
-  type: 'credit_card' | 'paypal' | 'apple_pay' | 'google_pay';
+  type: 'credit_card' | 'paypal' | 'apple_pay' | 'google_pay' | 'cash_on_delivery';
   name: string; // Display name like "Visa ending in 1234"
   icon?: string;
 }

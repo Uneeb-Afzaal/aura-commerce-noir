@@ -35,7 +35,7 @@ export function HeroSection() {
       
       <div className="container mx-auto px-4 relative z-10 pt-24 pb-20 md:pb-32">
         <div className="max-w-2xl">
-          <motion.p 
+          {/* <motion.p 
             className="text-gold uppercase tracking-widest font-medium mb-4 text-sm"
             custom={0}
             initial="hidden"
@@ -43,7 +43,7 @@ export function HeroSection() {
             variants={fadeIn}
           >
             Introducing Our Latest Collection
-          </motion.p>
+          </motion.p> */}
           
           <motion.h1 
             className="text-4xl md:text-6xl lg:text-7xl font-light mb-6 leading-tight"
@@ -52,8 +52,8 @@ export function HeroSection() {
             animate="visible"
             variants={fadeIn}
           >
-            Discover your <br />
-            <span className="text-gold italic">signature scent</span>
+            Inspired by Tradtion <br />
+            <span className="text-gold italic">Designed for Soul</span>
           </motion.h1>
           
           <motion.p 

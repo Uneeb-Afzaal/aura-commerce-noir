@@ -129,7 +129,7 @@ const OrderManagement = () => {
                     {new Date(order.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>{order.shippingAddress.fullName}</TableCell>
-                  <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
+                  <TableCell>PKR {order.totalAmount.toFixed(2)}</TableCell>
                   <TableCell>
                     <Select
                       value={order.status}
@@ -243,10 +243,10 @@ const OrderManagement = () => {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>${item.price.toFixed(2)}</TableCell>
+                        <TableCell>PKR {item.price.toFixed(2)}</TableCell>
                         <TableCell>{item.quantity}</TableCell>
                         <TableCell className="text-right">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          PKR {(item.price * item.quantity).toFixed(2)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -254,7 +254,7 @@ const OrderManagement = () => {
                 </Table>
                 <div className="mt-4 text-right">
                   <p className="text-lg font-bold">
-                    Total: ${selectedOrder.totalAmount.toFixed(2)}
+                    Total: PKR {selectedOrder.totalAmount.toFixed(2)}
                   </p>
                 </div>
               </div>

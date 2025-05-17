@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useAdmin } from "@/context/admin-context";
+import { useAdmin } from "@/context/auth-centext";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -298,7 +298,7 @@ const ProductManagement = () => {
                   <TableCell>
                     <Badge variant="outline">{product.category}</Badge>
                   </TableCell>
-                  <TableCell>${product.price.toFixed(2)}</TableCell>
+                  <TableCell>PKR {product.price.toFixed(2)}</TableCell>
                   <TableCell>
                     <span className={product.stock && product.stock < 10 ? "text-red-400" : ""}>
                       {product.stock}

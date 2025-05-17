@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useUser } from "@/context/user-context";
+import { useUser } from "@/context/auth-centext";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -67,7 +67,9 @@ const Login = () => {
     setIsRegistering(true);
     
     try {
+      console.log('in success')
       const success = await register(registerEmail, registerPassword, registerName);
+      console.log(success);
       if (success) {
         navigate("/profile");
       }

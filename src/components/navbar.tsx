@@ -127,9 +127,11 @@ export function Navbar() {
             </Button>
           )}
           
+          <Link to="/profile">
           <Button size="icon" variant="ghost">
             <User className="h-5 w-5" />
           </Button>
+          </Link>
           
           <Link to="/wishlist">
             <Button size="icon" variant="ghost" className="relative">

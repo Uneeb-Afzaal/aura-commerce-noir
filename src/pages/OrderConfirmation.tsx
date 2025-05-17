@@ -159,7 +159,7 @@ const OrderConfirmation = () => {
               <PrinterIcon size={16} />
               Print Invoice
             </Button>
-            {order.status !== "returned" && (
+            {/* {order.status !== "returned" && (
               <Button
                 variant="outline"
                 className="flex items-center gap-2 border-red-500 text-red-500 hover:bg-red-900/20"
@@ -167,16 +167,25 @@ const OrderConfirmation = () => {
               >
                 Return Order
               </Button>
-            )}
+            )} */}
           </div>
-          <Button
-            variant="default"
-            className="bg-[#FFD700] hover:bg-[#F5CB00] text-black flex items-center gap-2"
-            onClick={handleReorder}
-          >
-            <RefreshCw size={16} />
-            Reorder
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="default"
+              className="bg-[#FFD700] hover:bg-[#F5CB00] text-black flex items-center gap-2"
+              onClick={handleReorder}
+            >
+              <RefreshCw size={16} />
+              Reorder
+            </Button>
+            <Button
+              variant="default"
+              className="bg-[#FFD700] hover:bg-[#F5CB00] text-black flex items-center gap-2"
+              onClick={() => navigate("/")}
+            >
+              Return Home
+            </Button>
+          </div>
         </CardFooter>
       </Card>
     </div>

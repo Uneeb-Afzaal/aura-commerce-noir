@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Navigate, Outlet, Link, useLocation } from "react-router-dom";
-import { useAdmin } from "@/context/admin-context";
+import { useAdmin } from "@/context/auth-centext";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Archive, Package, Settings, ShoppingBag, User, Users } from "lucide-react";

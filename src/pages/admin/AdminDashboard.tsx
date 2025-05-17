@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useOrders } from "@/context/order-context";
-import { useAdmin } from "@/context/admin-context";
+import { useAdmin } from "@/context/auth-centext";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, Users, Package, DollarSign } from "lucide-react";
 
@@ -22,7 +22,7 @@ const AdminDashboard = () => {
   const stats = [
     {
       name: "Total Revenue",
-      value: `$${totalSales.toFixed(2)}`,
+      value: `${totalSales.toFixed(2)}`,
       icon: DollarSign,
       color: "text-green-500"
     },

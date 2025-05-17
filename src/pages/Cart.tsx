@@ -70,7 +70,7 @@ const Cart = () => {
                               </Link>
                               <p className="text-sm text-noir-300">{item.brand}</p>
                             </div>
-                            <p className="text-gold">${item.price.toFixed(2)}</p>
+                            <p className="text-gold">PKR {item.price.toFixed(2)}</p>
                           </div>
                           
                           <div className="flex justify-between items-center mt-4">
@@ -131,7 +131,7 @@ const Cart = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span>Subtotal</span>
-                      <span>${subtotal.toFixed(2)}</span>
+                      <span>PKR {subtotal.toFixed(2)}</span>
                     </div>
                     
                     <div className="flex justify-between">
@@ -140,19 +140,19 @@ const Cart = () => {
                         {shippingCost === 0 ? (
                           <span className="text-green-500">Free</span>
                         ) : (
-                          `$${shippingCost.toFixed(2)}`
+                          `PKR ${shippingCost.toFixed(2)}`
                         )}
                       </span>
                     </div>
                     
                     <div className="flex justify-between">
                       <span>Tax (10%)</span>
-                      <span>${tax.toFixed(2)}</span>
+                      <span>PKR {tax.toFixed(2)}</span>
                     </div>
                     
                     <div className="pt-4 mt-4 border-t border-noir-700 flex justify-between font-medium">
                       <span>Total</span>
-                      <span className="text-gold">${total.toFixed(2)}</span>
+                      <span className="text-gold">PKR {total.toFixed(2)}</span>
                     </div>
                   </div>
                   
@@ -162,9 +162,9 @@ const Cart = () => {
                     </Button>
                   </Link>
                   
-                  <div className="mt-4 text-xs text-center text-noir-400">
-                    Free shipping on orders over $200
-                  </div>
+                  {/* <div className="mt-4 text-xs text-center text-noir-400">
+                    Free shipping on orders over PKR 200
+                  </div> */}
                 </div>
               </div>
             </div>

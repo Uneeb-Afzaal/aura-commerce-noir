@@ -8,8 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+<<<<<<< Updated upstream
 import { useUser } from "@/context/user-context";
 import { BadgeCheck, Mail, Package, Phone, User, MapPin, Plus, Pencil, Save, Trash2 } from "lucide-react";
+=======
+import { useUser } from "@/context/auth-centext";
+import { BadgeCheck, Trash2, Mail, Package, Phone, User, MapPin, Plus, Pencil, Save } from "lucide-react";
+>>>>>>> Stashed changes
 
 const Profile = () => {
   const { isAuthenticated, profile, updateProfile, logout, orders, addAddress, updateAddress, removeAddress } = useUser();
@@ -51,7 +56,7 @@ const Profile = () => {
     e.preventDefault();
     
     if (editingAddressIndex !== null) {
-      updateAddress(editingAddressIndex.toString(), addressForm);
+      updateAddress(editingAddressIndex, addressForm);
       setEditingAddressIndex(null);
     } else {
       addAddress(addressForm);
@@ -279,7 +284,7 @@ const Profile = () => {
                                     <div>
                                       <p className="text-sm font-medium">{item.name}</p>
                                       <p className="text-xs text-noir-400">
-                                        ${item.price.toFixed(2)} × {item.quantity}
+                                        PKR {item.price.toFixed(2)} × {item.quantity}
                                       </p>
                                     </div>
                                   </div>

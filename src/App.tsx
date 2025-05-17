@@ -7,8 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/context/cart-context";
 import { WishlistProvider } from "@/context/wishlist-context";
 import { OrderProvider } from "@/context/order-context";
-import { AdminProvider } from "@/context/admin-context";
-import { UserProvider } from "@/context/user-context";
+// import { AdminProvider } from "@/context/admin-context";
+// import { UserProvider } from "@/context/user-context";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
@@ -27,16 +27,22 @@ import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Checkout from "./pages/Checkout";
 import OrderTracking from "./pages/OrderTracking";
+<<<<<<< Updated upstream
 import Collections from "./pages/Collections";
 import About from "./pages/About";
+=======
+import About from './pages/About';
+import Collections from "./pages/Collection";
+import { AppProvider } from "./context/auth-centext";
+>>>>>>> Stashed changes
 
 const queryClient = new QueryClient();
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AdminProvider>
-        <UserProvider>
+     <AppProvider>
           <OrderProvider>
             <CartProvider>
               <WishlistProvider>
@@ -56,6 +62,8 @@ const App = () => (
                     <Route path="/order-tracking/:id" element={<OrderTracking />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/about" element={<About/>}/>
+                    <Route path="/collection" element={<Collections/>}/>
                     
                     {/* Admin Routes */}
                     <Route path="/admin/login" element={<AdminLogin />} />
@@ -74,8 +82,7 @@ const App = () => (
               </WishlistProvider>
             </CartProvider>
           </OrderProvider>
-        </UserProvider>
-      </AdminProvider>
+          </AppProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Search, Filter, ChevronDown, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { getProducts } from "@/lib/product-service";
 import {
   Select,
   SelectTrigger,
@@ -17,74 +18,75 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Product } from "@/types";
 
-// Mock product data
-const products = [
-  {
-    id: "1",
-    name: "Oud Noir Intense",
-    brand: "AURA",
-    price: 215,
-    imageUrl: "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=500&q=60",
-    rating: 5
-  },
-  {
-    id: "2",
-    name: "Ambre Éternel",
-    brand: "Exclusive",
-    price: 175,
-    imageUrl: "https://images.unsplash.com/photo-1557170334-a9086426b0c2?auto=format&fit=crop&w=500&q=60",
-    rating: 4
-  },
-  {
-    id: "3",
-    name: "Velvet Rose & Gold",
-    brand: "AURA",
-    price: 195,
-    imageUrl: "https://images.unsplash.com/photo-1587017539504-67cfbddac569?auto=format&fit=crop&w=500&q=60",
-    rating: 5
-  },
-  {
-    id: "4",
-    name: "Bois de Santal",
-    brand: "Luxury",
-    price: 230,
-    imageUrl: "https://images.unsplash.com/photo-1595425970377-c9393ee12689?auto=format&fit=crop&w=500&q=60",
-    rating: 4
-  },
-  {
-    id: "5",
-    name: "Midnight Orchid",
-    brand: "AURA",
-    price: 185,
-    imageUrl: "https://images.unsplash.com/photo-1615341805327-154891803c7f?auto=format&fit=crop&w=500&q=60",
-    rating: 5
-  },
-  {
-    id: "6",
-    name: "Vetiver & Amber",
-    brand: "Premium",
-    price: 165,
-    imageUrl: "https://images.unsplash.com/photo-1605651202774-7d573fd3f12d?auto=format&fit=crop&w=500&q=60",
-    rating: 4
-  },
-  {
-    id: "7",
-    name: "Saffron Oud",
-    brand: "Luxury",
-    price: 260,
-    imageUrl: "https://images.unsplash.com/photo-1608528577891-eb055944f2e7?auto=format&fit=crop&w=500&q=60",
-    rating: 5
-  },
-  {
-    id: "8",
-    name: "Noir Absolu",
-    brand: "AURA",
-    price: 210,
-    imageUrl: "https://images.unsplash.com/photo-1559783510-c056abca0733?auto=format&fit=crop&w=500&q=60",
-    rating: 4
-  },
-];
+// // Mock product data
+// const products = [
+//   {
+//     id: "1",
+//     name: "Oud Noir Intense",
+//     brand: "Sufianah",
+//     price: 215,
+//     imageUrl: "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=500&q=60",
+//     rating: 5
+//   },
+//   {
+//     id: "2",
+//     name: "Ambre Éternel",
+//     brand: "Exclusive",
+//     price: 175,
+//     imageUrl: "https://images.unsplash.com/photo-1557170334-a9086426b0c2?auto=format&fit=crop&w=500&q=60",
+//     rating: 4
+//   },
+//   {
+//     id: "3",
+//     name: "Velvet Rose & Gold",
+//     brand: "Sufianah",
+//     price: 195,
+//     imageUrl: "https://images.unsplash.com/photo-1587017539504-67cfbddac569?auto=format&fit=crop&w=500&q=60",
+//     rating: 5
+//   },
+//   {
+//     id: "4",
+//     name: "Bois de Santal",
+//     brand: "Luxury",
+//     price: 230,
+//     imageUrl: "https://images.unsplash.com/photo-1595425970377-c9393ee12689?auto=format&fit=crop&w=500&q=60",
+//     rating: 4
+//   },
+//   {
+//     id: "5",
+//     name: "Midnight Orchid",
+//     brand: "Sufianah",
+//     price: 185,
+//     imageUrl: "https://images.unsplash.com/photo-1615341805327-154891803c7f?auto=format&fit=crop&w=500&q=60",
+//     rating: 5
+//   },
+//   {
+//     id: "6",
+//     name: "Vetiver & Amber",
+//     brand: "Premium",
+//     price: 165,
+//     imageUrl: "https://images.unsplash.com/photo-1605651202774-7d573fd3f12d?auto=format&fit=crop&w=500&q=60",
+//     rating: 4
+//   },
+//   {
+//     id: "7",
+//     name: "Saffron Oud",
+//     brand: "Luxury",
+//     price: 260,
+//     imageUrl: "https://images.unsplash.com/photo-1608528577891-eb055944f2e7?auto=format&fit=crop&w=500&q=60",
+//     rating: 5
+//   },
+//   {
+//     id: "8",
+//     name: "Noir Absolu",
+//     brand: "Sufianah",
+//     price: 210,
+//     imageUrl: "https://images.unsplash.com/photo-1559783510-c056abca0733?auto=format&fit=crop&w=500&q=60",
+//     rating: 4
+//   },
+// ];
 
 // Filter categories
 const categories = [
@@ -94,7 +96,7 @@ const categories = [
   { id: "unisex", name: "Unisex" },
 ];
 
-const brands = ["AURA", "Luxury", "Exclusive", "Premium"];
+const brands = ["Sufianah", "Luxury", "Exclusive", "Premium"];
 const sortOptions = [
   { value: "featured", label: "Featured" },
   { value: "price-asc", label: "Price: Low to High" },
@@ -109,6 +111,8 @@ const Shop = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("featured");
+  const [products, setProducts] = useState<Product[]>();
+  const [isLoading, setIsLoading] = useState(true);
 
   const toggleBrand = (brand: string) => {
     if (selectedBrands.includes(brand)) {
@@ -117,6 +121,43 @@ const Shop = () => {
       setSelectedBrands([...selectedBrands, brand]);
     }
   };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true);
+        const products = await getProducts();
+        setProducts(products);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-noir-900 text-foreground">
+        <Navbar />
+        <main className="pt-24">
+          <div className="container mx-auto px-4 py-12">
+            <div className="flex flex-col items-center justify-center min-h-[400px]">
+              <div className="relative w-20 h-20">
+                <div className="absolute inset-0 border-4 border-gold/20 rounded-full"></div>
+                <div className="absolute inset-0 border-4 border-gold rounded-full animate-spin border-t-transparent"></div>
+              </div>
+              <p className="mt-6 text-gold/80 text-lg font-light">
+                Loading exquisite fragrances...
+              </p>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-noir-900 text-foreground">
@@ -224,8 +265,8 @@ const Shop = () => {
                   />
                 </div>
                 <div className="flex justify-between items-center mt-4 text-sm">
-                  <span>${priceRange[0]}</span>
-                  <span>${priceRange[1]}</span>
+                  <span>PKR {priceRange[0]}</span>
+                  <span>PKR {priceRange[1]}</span>
                 </div>
               </div>
               

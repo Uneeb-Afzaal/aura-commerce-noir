@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useAdmin } from "@/context/admin-context";
+import { useAdmin } from "@/context/auth-centext";
 import { Promotion } from "@/types";
 import { Button } from "@/components/ui/button";
 import { 

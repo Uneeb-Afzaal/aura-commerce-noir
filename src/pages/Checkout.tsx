@@ -12,11 +12,12 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/context/cart-context";
-import { useUser } from "@/context/user-context";
+import { useUser } from "@/context/auth-centext";
 import { useOrders } from "@/context/order-context";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Address, ShippingOption, PaymentMethod, CartItem } from "@/types";
+import CryptoJS from 'crypto-js';
 
 const shippingOptions: ShippingOption[] = [
   {
@@ -43,25 +44,40 @@ const shippingOptions: ShippingOption[] = [
 ];
 
 const paymentMethods: PaymentMethod[] = [
+  // {
+  //   id: "credit-card",
+  //   type: "credit_card",
+  //   name: "Credit Card",
+  //   icon: "💳",
+  // },
+  // {
+  //   id: "paypal",
+  //   type: "paypal",
+  //   name: "PayPal",
+  //   icon: "🅿️",
+  // },
+  // {
+  //   id: "apple-pay",
+  //   type: "apple_pay",
+  //   name: "Apple Pay",
+  //   icon: "🍎",
+  // },
   {
-    id: "credit-card",
-    type: "credit_card",
-    name: "Credit Card",
-    icon: "💳",
-  },
-  {
-    id: "paypal",
-    type: "paypal",
-    name: "PayPal",
-    icon: "🅿️",
-  },
-  {
-    id: "apple-pay",
-    type: "apple_pay",
-    name: "Apple Pay",
-    icon: "🍎",
+    id: "cash-on-delivery",
+    type: "cash_on_delivery",
+    name: "Cash on Delivery",
+    icon: "💵",
   },
 ];
+
+const JAZZCASH = {
+  MERCHANT_ID: import.meta.env.VITE_JAZZCASH_MERCHANT_ID || '',
+  PASSWORD: import.meta.env.VITE_JAZZCASH_PASSWORD || '',
+  INTEGRITY_SALT: import.meta.env.VITE_JAZZCASH_INTEGRITY_SALT || '',
+  ENDPOINT: import.meta.env.VITE_JAZZCASH_ENDPOINT || '',
+  RETURN_URL: import.meta.env.VITE_JAZZCASH_RETURN_URL || '',
+  CANCEL_URL: import.meta.env.VITE_JAZZCASH_CANCEL_URL || '',
+};
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -101,6 +117,18 @@ const Checkout = () => {
       navigate("/cart");
     }
   }, [items, navigate]);
+
+  useEffect(() => {
+    console.log("isAuthenticated:", isAuthenticated);
+    console.log("profile:", profile);
+    if (isAuthenticated && profile && profile.addresses.length > 0) {
+      setShippingAddress(profile.addresses[0]);
+      setSelectedAddressIndex(0);
+    }
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, profile]);
   
   // Set shipping address from profile if available
   useEffect(() => {
@@ -131,7 +159,7 @@ const Checkout = () => {
       setDiscount(discountAmount);
       toast({
         title: "Promo code applied!",
-        description: `You received a 10% discount of $${discountAmount.toFixed(2)}.`,
+        description: `You received a 10% discount of PKR ${discountAmount.toFixed(2)}.`,
       });
     } else if (promoCode.toLowerCase() === "freeship") {
       const discountAmount = selectedShipping.price;
@@ -179,6 +207,55 @@ const Checkout = () => {
     
     setCurrentStep("review");
   };
+
+  const handleJazzCash = (orderId: string, amount: number) => {
+        // 1. Build the payload
+        const now        = new Date();
+        const txnDateTime = now.toISOString().slice(0,19).replace('T',' ');
+        const amtString   = (amount * 100).toFixed(0); // PKR to paisa
+    
+        const payload: Record<string,string> = {
+          pp_Version:       '1.1',
+          pp_TxnType:       'MPAY',
+          pp_Language:      'EN',
+          pp_MerchantID:    JAZZCASH.MERCHANT_ID,
+          pp_Password:      JAZZCASH.PASSWORD,
+          pp_TxnRefNo:      orderId,
+          pp_Amount:        amtString,
+          pp_TxnCurrency:   'PKR',
+          pp_TxnDateTime:   txnDateTime,
+          pp_BillReference: `billRef_${orderId}`,
+          pp_Description:   `Order #${orderId}`,
+          pp_ReturnURL:     JAZZCASH.RETURN_URL,
+          pp_CancelURL:     JAZZCASH.CANCEL_URL,
+        };
+    
+        // 2. Create the secure hash
+        //    – sort keys, concatenate values (no delimiters), HMAC-SHA256 over that string
+        const hashString = Object
+          .keys(payload)
+          .sort()
+          .map((k) => payload[k])
+          .join('');
+        const secureHash = CryptoJS
+          .HmacSHA256(hashString, JAZZCASH.INTEGRITY_SALT)
+          .toString(CryptoJS.enc.Hex);
+        payload.pp_SecureHash = secureHash;
+    
+        // 3. Build & auto-submit the form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = JAZZCASH.ENDPOINT;
+        Object.entries(payload).forEach(([key, value]) => {
+          const input = document.createElement('input');
+          input.type  = 'hidden';
+          input.name  = key;
+          input.value = value;
+          form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
+      };
   
   const handlePlaceOrder = async () => {
     setIsLoading(true);
@@ -196,7 +273,7 @@ const Checkout = () => {
       }));
       
       // Create the order
-      const order = createOrder(
+      const order = await createOrder(
         orderItems, 
         shippingAddress,
         selectedPaymentMethod.name
@@ -204,15 +281,17 @@ const Checkout = () => {
       
       // Clear cart after successful order
       clearCart();
+
+      console.log("Order created:", order);
       
       // Show success toast
       toast({
         title: "Order placed successfully!",
-        description: `Your order #${order.id.substring(6)} has been confirmed.`,
+        description: `Your order #${(await order).id.substring(6)} has been confirmed.`,
       });
       
       // Redirect to order confirmation page
-      navigate(`/order-confirmation/${order.id}`);
+      navigate(`/order-confirmation/${(await order).id}`);
     } catch (error) {
       console.error("Failed to place order:", error);
       toast({
@@ -418,7 +497,7 @@ const Checkout = () => {
                                 <p className="text-sm text-noir-400">{option.description}</p>
                               </div>
                               <div className="text-right">
-                                <p className="font-medium">${option.price.toFixed(2)}</p>
+                                <p className="font-medium">PKR {option.price.toFixed(2)}</p>
                                 <p className="text-xs text-noir-400">{option.estimatedDays} days</p>
                               </div>
                             </div>
@@ -612,7 +691,7 @@ const Checkout = () => {
                             <p className="font-medium">{selectedShipping.name}</p>
                             <p className="text-sm text-noir-400">{selectedShipping.description}</p>
                           </div>
-                          <p className="font-medium">${selectedShipping.price.toFixed(2)}</p>
+                          <p className="font-medium">PKR {selectedShipping.price.toFixed(2)}</p>
                         </div>
                       </div>
                       
@@ -697,21 +776,21 @@ const Checkout = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-noir-400">Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
-                      <span>${subtotal.toFixed(2)}</span>
+                      <span>PKR {subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-noir-400">Shipping</span>
-                      <span>${shipping.toFixed(2)}</span>
+                      <span>PKR {shipping.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-noir-400">Tax</span>
-                      <span>${tax.toFixed(2)}</span>
+                      <span>PKR {tax.toFixed(2)}</span>
                     </div>
                     
                     {discount > 0 && (
                       <div className="flex justify-between text-green-500">
                         <span>Discount</span>
-                        <span>-${discount.toFixed(2)}</span>
+                        <span>-PKR {discount.toFixed(2)}</span>
                       </div>
                     )}
                     
@@ -719,7 +798,7 @@ const Checkout = () => {
                     
                     <div className="flex justify-between font-medium text-lg">
                       <span>Total</span>
-                      <span className="text-gold">${total.toFixed(2)}</span>
+                      <span className="text-gold">PKR {total.toFixed(2)}</span>
                     </div>
                   </div>
                   
@@ -739,7 +818,7 @@ const Checkout = () => {
                             <p className="text-sm font-medium">{item.name}</p>
                             <p className="text-xs text-noir-400">Qty: {item.quantity}</p>
                           </div>
-                          <p className="text-sm">${(item.price * item.quantity).toFixed(2)}</p>
+                          <p className="text-sm">PKR {(item.price * item.quantity).toFixed(2)}</p>
                         </div>
                       ))}
                     </div>

@@ -3,6 +3,9 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingCart } from "lucide-react";
+import { useWishlist } from "@/context/wishlist-context";
+import { useCart } from "@/context/cart-context";
+import { Product } from "@/types";
 
 interface ProductCardProps {
   id: string;
@@ -23,6 +26,23 @@ export function ProductCard({
   rating,
   className,
 }: ProductCardProps) {
+  const { addItem: addToWishlist, isInWishlist, removeItem: removeFromWishlist } = useWishlist();
+  const { addItem } = useCart();
+
+  const handleWishlistClick = () => {
+   const product : Product = { id, name, brand, price, imageUrl , rating : 0  };
+    if (isInWishlist(id)) {
+      removeFromWishlist(id);
+    } else {
+      addToWishlist(product);
+    }
+  };
+
+  const handleAddToCart = () => {
+    const product : Product = { id, name, brand, price, imageUrl , rating : 0 };
+    addItem(product);
+  };
+
   return (
     <motion.div
       className={cn(
@@ -45,9 +65,12 @@ export function ProductCard({
           <Button
             size="icon"
             variant="outline"
-            className="h-8 w-8 rounded-full bg-noir-800/50 backdrop-blur-sm hover:bg-noir-700 hover:text-gold"
+            className={`h-8 w-8 rounded-full bg-noir-800/50 backdrop-blur-sm hover:bg-noir-700 ${
+              isInWishlist(id) ? "text-gold" : "hover:text-gold"
+            }`}
+            onClick={handleWishlistClick}
           >
-            <Heart className="h-4 w-4" />
+            <Heart className={`h-4 w-4 ${isInWishlist(id) ? "fill-gold" : ""}`} />
             <span className="sr-only">Add to wishlist</span>
           </Button>
         </div>
@@ -75,9 +98,14 @@ export function ProductCard({
         
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold text-foreground">
-            ${price.toFixed(2)}
+            PKR {price.toFixed(2)}
           </span>
-          <Button variant="outline" size="sm" className="h-9 border-gold hover:bg-gold hover:text-noir-900">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-9 border-gold hover:bg-gold hover:text-noir-900"
+            onClick={handleAddToCart}
+          >
             <ShoppingCart className="mr-2 h-4 w-4" />
             Add
           </Button>

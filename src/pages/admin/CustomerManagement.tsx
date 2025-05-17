@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useAdmin } from "@/context/admin-context";
+import { useAdmin } from "@/context/auth-centext";
 import { useOrders } from "@/context/order-context";
 import { User } from "@/types";
 import { 
@@ -98,7 +98,7 @@ const CustomerManagement = () => {
                       {getCustomerOrders(customer.id).length}
                     </Badge>
                   </TableCell>
-                  <TableCell>${getTotalSpent(customer.id).toFixed(2)}</TableCell>
+                  <TableCell>PKR {getTotalSpent(customer.id).toFixed(2)}</TableCell>
                   <TableCell>
                     <Button
                       variant="ghost"
@@ -144,7 +144,7 @@ const CustomerManagement = () => {
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-gray-400">Order Summary</h3>
                   <p>Total Orders: {getCustomerOrders(selectedUser.id).length}</p>
-                  <p>Total Spent: ${getTotalSpent(selectedUser.id).toFixed(2)}</p>
+                  <p>Total Spent: PKR {getTotalSpent(selectedUser.id).toFixed(2)}</p>
                 </div>
               </div>
 
@@ -167,7 +167,7 @@ const CustomerManagement = () => {
                           <TableCell>
                             {new Date(order.createdAt).toLocaleDateString()}
                           </TableCell>
-                          <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
+                          <TableCell>PKR {order.totalAmount.toFixed(2)}</TableCell>
                           <TableCell>
                             <Badge
                               variant="outline"

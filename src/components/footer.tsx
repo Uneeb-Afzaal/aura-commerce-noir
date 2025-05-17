@@ -83,7 +83,7 @@ export function Footer() {
               </div>
               <div className="flex items-center text-sm text-noir-300">
                 <Mail className="h-4 w-4 mr-2 text-gold" />
-                <span>contact@auranoir.com</span>
+                <span>sufianah.help@gmail.com</span>
               </div>
             </div>
           </div>
@@ -91,14 +91,14 @@ export function Footer() {
         
         <div className="pt-8 border-t border-noir-800 flex flex-col md:flex-row justify-between items-center">
           <p className="text-noir-400 text-sm mb-4 md:mb-0">
-            © {new Date().getFullYear()} AURA NOIR. All rights reserved.
+            © {new Date().getFullYear()} Sufianah. All rights reserved.
           </p>
-          <div className="flex items-center space-x-4">
+          {/* <div className="flex items-center space-x-4">
             <img src="/visa.svg" alt="Visa" className="h-6 opacity-60 hover:opacity-100 transition-opacity" />
             <img src="/mastercard.svg" alt="Mastercard" className="h-6 opacity-60 hover:opacity-100 transition-opacity" />
             <img src="/amex.svg" alt="American Express" className="h-6 opacity-60 hover:opacity-100 transition-opacity" />
             <img src="/paypal.svg" alt="PayPal" className="h-6 opacity-60 hover:opacity-100 transition-opacity" />
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

@@ -43,7 +43,7 @@ const Index = () => {
                   The Art of <span className="text-gold">Fragrance</span>
                 </h2>
                 <p className="text-noir-100 mb-6">
-                  At AURA NOIR, we believe fragrance is more than just a scent; it's an expression of individuality and a powerful trigger of memories and emotions.
+                  At Sufianah, we believe fragrance is more than just a scent; it's an expression of individuality and a powerful trigger of memories and emotions.
                 </p>
                 <p className="text-noir-200 mb-8">
                   Our master perfumers blend rare and precious ingredients from around the world to create unique compositions that evolve with your personal chemistry, resulting in a truly individual olfactory signature.
@@ -89,7 +89,7 @@ const Index = () => {
                     "
                   </div>
                   <p className="text-noir-100 mb-6 mt-3">
-                    "The fragrances from AURA NOIR are truly exceptional. The attention to detail in each composition is remarkable, creating scents that are both memorable and uniquely sophisticated."
+                    "The fragrances from Sufianah are truly exceptional. The attention to detail in each composition is remarkable, creating scents that are both memorable and uniquely sophisticated."
                   </p>
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-noir-600 rounded-full mr-3"></div>
