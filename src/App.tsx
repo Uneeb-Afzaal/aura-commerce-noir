@@ -27,14 +27,11 @@ import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Checkout from "./pages/Checkout";
 import OrderTracking from "./pages/OrderTracking";
-<<<<<<< Updated upstream
-import Collections from "./pages/Collections";
-import About from "./pages/About";
-=======
+
 import About from './pages/About';
 import Collections from "./pages/Collection";
 import { AppProvider } from "./context/auth-centext";
->>>>>>> Stashed changes
+
 
 const queryClient = new QueryClient();
 
