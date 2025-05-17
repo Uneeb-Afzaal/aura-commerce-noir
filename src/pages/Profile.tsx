@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { useUser } from "@/context/user-context";
-import { BadgeCheck, Mail, Package, Phone, User, MapPin, Plus, Pencil, Save } from "lucide-react";
+import { BadgeCheck, Mail, Package, Phone, User, MapPin, Plus, Pencil, Save, Trash2 } from "lucide-react";
 
 const Profile = () => {
   const { isAuthenticated, profile, updateProfile, logout, orders, addAddress, updateAddress, removeAddress } = useUser();
