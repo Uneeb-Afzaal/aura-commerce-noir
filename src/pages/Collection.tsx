@@ -6,6 +6,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import collection1 from "@/assets/images/col1.png";
 
 const Collections = () => {
   // Collection categories
@@ -14,7 +15,7 @@ const Collections = () => {
       id: "signature",
       name: "Signature Collection",
       description: "Our most iconic fragrances that define luxury and sophistication.",
-      image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?auto=format&fit=crop&w=800&q=80",
+      image: collection1,
       products: [
         { id: "sig1", name: "Midnight Amber", description: "Deep woody notes with amber and musk", price: 185 },
         { id: "sig2", name: "Golden Elixir", description: "A rich blend of vanilla and sandalwood", price: 195 },
@@ -79,7 +80,7 @@ const Collections = () => {
           </div>
           
           <Tabs defaultValue={collections[0].id} className="mb-16">
-            <TabsList className="w-full flex overflow-x-auto space-x-2 bg-transparent mb-8">
+            <TabsList className="w-full flex overflow-x space-x-2 bg-transparent mb-8">
               {collections.map((collection) => (
                 <TabsTrigger 
                   key={collection.id} 

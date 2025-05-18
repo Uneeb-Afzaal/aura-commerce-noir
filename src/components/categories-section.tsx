@@ -1,17 +1,19 @@
 
 import { motion } from "framer-motion";
+import fem from "@/assets/images/fem.png";
+import mal from "@/assets/images/mal.png";
 
 const categories = [
   {
     id: "1",
     name: "For Him",
-    image: "https://images.unsplash.com/photo-1508341591423-4347099e1f19?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bWVuJTIwcGVyZnVtZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+    image: mal,
     description: "Bold and sophisticated fragrances for the modern gentleman"
   },
   {
     id: "2",
     name: "For Her",
-    image: "https://images.unsplash.com/photo-1615341738194-71a758e9f4e9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d29tZW4lMjBwZXJmdW1lfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    image: fem,
     description: "Elegant and captivating scents that leave a lasting impression"
   },
   {

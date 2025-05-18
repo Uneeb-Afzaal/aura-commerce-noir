@@ -6,6 +6,7 @@ import { FeaturedProducts } from "@/components/featured-products";
 import { CategoriesSection } from "@/components/categories-section";
 import { NewsletterSection } from "@/components/newsletter-section";
 import { Footer } from "@/components/footer";
+import banner from "@/assets/images/banner.png";
 
 const Index = () => {
   return (
@@ -26,7 +27,7 @@ const Index = () => {
                 transition={{ duration: 0.6 }}
               >
                 <img 
-                  src="https://images.unsplash.com/photo-1595425970377-c9393ee12689?auto=format&fit=crop&w=800&q=80" 
+                  src={banner} 
                   alt="Luxury Fragrance" 
                   className="rounded-lg shadow-2xl"
                 />

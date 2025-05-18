@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import banner from "@/assets/images/banner2.png";
 
 export function HeroSection() {
   const fadeIn = {
@@ -21,7 +22,7 @@ export function HeroSection() {
     <section className="relative min-h-screen overflow-hidden flex flex-col justify-end">
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-t from-noir-900 via-noir-900/80 to-transparent z-10" />
-        <video
+        {/* <video
           autoPlay
           loop
           muted
@@ -30,7 +31,12 @@ export function HeroSection() {
           poster="https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?q=80&w=1600&auto=format"
         >
           <source src="https://videos.pexels.com/videos/man-applying-perfume-6764443" type="video/mp4" />
-        </video>
+        </video> */}
+        <img
+          src={banner}
+          alt="Hero Image"
+          className="object-cover w-full h-full"
+        />
       </div>
       
       <div className="container mx-auto px-4 relative z-10 pt-24 pb-20 md:pb-32">
