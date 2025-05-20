@@ -107,7 +107,7 @@ const ProductManagement = () => {
               <Plus size={16} /> Add Product
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-gray-900 border-gray-800">
+          <DialogContent className="bg-gray-900 border-gray-800 max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Product</DialogTitle>
               <DialogDescription>
