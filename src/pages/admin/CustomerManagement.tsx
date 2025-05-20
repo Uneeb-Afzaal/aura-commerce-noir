@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { useAdmin } from "@/context/auth-centext";
 import { useOrders } from "@/context/order-context";
 import { User } from "@/types";
@@ -19,10 +19,23 @@ import { Eye, User as UserIcon } from "lucide-react";
 
 const CustomerManagement = () => {
   const { users } = useAdmin();
-  const { orders } = useOrders();
+  const { getAllOrders } = useOrders();
+  const [orders , setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    // define and immediately invoke an async fetch function
+    (async () => {
+      try {
+        const orders = await getAllOrders();
+        setOrders(orders);
+      } catch (err) {
+        console.error("Failed to load orders:", err);
+      }
+    })();
+  }, [getAllOrders]);
 
   // Filter only customer users 
   const customers = users.filter(user => user.role === "customer");
@@ -32,6 +45,43 @@ const CustomerManagement = () => {
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     customer.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  function parseDate(dateField: unknown): Date | null {
+    if (!dateField) return null;
+    
+    try {
+      // Handle Firestore timestamp objects
+      if (
+        typeof dateField === "object" &&
+        dateField !== null &&
+        "toDate" in dateField &&
+        typeof (dateField as any).toDate === "function"
+      ) {
+        return (dateField as any).toDate();
+      }
+      
+      // Handle raw timestamp objects
+      if (
+        typeof dateField === "object" &&
+        dateField !== null &&
+        "seconds" in (dateField as any) &&
+        typeof (dateField as any).seconds === "number"
+      ) {
+        return new Date((dateField as any).seconds * 1000);
+      }
+      
+      // Handle string dates in "Month Day, Year" format (e.g., "May 19, 2025")
+      if (typeof dateField === "string" && dateField.match(/^[A-Za-z]+\s\d{1,2},\s\d{4}$/)) {
+        return new Date(dateField);
+      }
+      
+      // Fallback for other date formats
+      const dt = new Date(dateField as any);
+      return isNaN(dt.getTime()) ? null : dt;
+    } catch {
+      return null;
+    }
+  }
 
   const handleViewCustomer = (customer: User) => {
     setSelectedUser(customer);
@@ -165,7 +215,11 @@ const CustomerManagement = () => {
                         <TableRow key={order.id} className="border-gray-800">
                           <TableCell>{order.id}</TableCell>
                           <TableCell>
-                            {new Date(order.createdAt).toLocaleDateString()}
+                            { parseDate(order.createdAt) ? parseDate(order.createdAt).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    }) : "N/A"}
                           </TableCell>
                           <TableCell>PKR {order.totalAmount.toFixed(2)}</TableCell>
                           <TableCell>

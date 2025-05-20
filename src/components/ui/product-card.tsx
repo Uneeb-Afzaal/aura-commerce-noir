@@ -1,10 +1,10 @@
-
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingCart } from "lucide-react";
 import { useWishlist } from "@/context/wishlist-context";
 import { useCart } from "@/context/cart-context";
+import { useNavigate } from "react-router-dom";
 import { Product } from "@/types";
 
 interface ProductCardProps {
@@ -26,11 +26,13 @@ export function ProductCard({
   rating,
   className,
 }: ProductCardProps) {
+  const router = useNavigate();
   const { addItem: addToWishlist, isInWishlist, removeItem: removeFromWishlist } = useWishlist();
   const { addItem } = useCart();
 
-  const handleWishlistClick = () => {
-   const product : Product = { id, name, brand, price, imageUrl , rating : 0  };
+  const handleWishlistClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    const product: Product = { id, name, brand, price, imageUrl, rating };
     if (isInWishlist(id)) {
       removeFromWishlist(id);
     } else {
@@ -38,15 +40,17 @@ export function ProductCard({
     }
   };
 
-  const handleAddToCart = () => {
-    const product : Product = { id, name, brand, price, imageUrl , rating : 0 };
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    const product: Product = { id, name, brand, price, imageUrl, rating };
     addItem(product);
   };
 
   return (
     <motion.div
+      onClick={() => router(`/product/${id}`)}
       className={cn(
-        "group relative overflow-hidden rounded-md bg-noir-700 border border-noir-600 flex flex-col",
+        "group relative overflow-hidden rounded-md bg-noir-700 border border-noir-600 flex flex-col cursor-pointer",
         className
       )}
       whileHover={{ y: -5 }}
@@ -75,7 +79,7 @@ export function ProductCard({
           </Button>
         </div>
       </div>
-      
+
       <div className="flex flex-1 flex-col justify-between p-4">
         <div>
           <p className="text-xs uppercase tracking-wider text-gold mb-1">{brand}</p>
@@ -95,14 +99,14 @@ export function ProductCard({
               ))}
           </div>
         </div>
-        
+
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold text-foreground">
             PKR {price.toFixed(2)}
           </span>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="h-9 border-gold hover:bg-gold hover:text-noir-900"
             onClick={handleAddToCart}
           >

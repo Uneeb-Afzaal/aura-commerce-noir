@@ -14,25 +14,29 @@ const About = () => {
       name: "Alexandra Moreau",
       role: "Founder & Master Perfumer",
       bio: "With over 20 years of experience in fragrance creation, Alexandra's vision drives our artistic direction.",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80",
+      image : '',
+      //image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80",
     },
     {
       name: "David Chen",
       role: "Creative Director",
       bio: "David oversees our brand identity and ensures each fragrance tells a compelling story.",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80",
+      image : '',
+      //image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80",
     },
     {
       name: "Sophia Rodriguez",
       role: "Head of Product Development",
       bio: "Sophia leads our innovative approach to creating sustainable luxury fragrances.",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=256&q=80",
+      image : '',
+      //image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=256&q=80",
     },
     {
       name: "Marcus Johnson",
       role: "Chief Sustainability Officer",
       bio: "Marcus ensures our commitment to ethical sourcing and environmental responsibility.",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80",
+      image : '',
+      // image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80",
     },
   ];
 

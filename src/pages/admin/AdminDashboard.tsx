@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState , useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useOrders } from "@/context/order-context";
 import { useAdmin } from "@/context/auth-centext";
@@ -7,8 +7,21 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, Users, Package, DollarSign } from "lucide-react";
 
 const AdminDashboard = () => {
-  const { orders } = useOrders();
+  const { getAllOrders } = useOrders();
   const { users, products } = useAdmin();
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    // define and immediately invoke an async fetch function
+    (async () => {
+      try {
+        const orders = await getAllOrders();
+        setOrders(orders);
+      } catch (err) {
+        console.error("Failed to load orders:", err);
+      }
+    })();
+  }, [getAllOrders]);
 
   // Calculate metrics
   const totalSales = orders.reduce((sum, order) => sum + order.totalAmount, 0);

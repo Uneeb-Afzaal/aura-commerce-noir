@@ -7,6 +7,7 @@ import {
   query,
   where,
   onSnapshot,
+  getDocs,
   addDoc,
   updateDoc,
   doc,
@@ -18,6 +19,7 @@ interface OrderContextType {
   orders: Order[];
   createOrder: (items: CartItem[], address: Address, paymentMethod: string) => Promise<Order | null>;
   getOrderById: (id: string) => Order | undefined;
+  getAllOrders: () => Promise<Order[]>;
   updateOrderStatus: (id: string, status: OrderStatus) => Promise<void>;
   initiateReturn: (id: string) => Promise<void>;
   reorder: (orderId: string) => CartItem[];
@@ -42,7 +44,6 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       setOrders([]);
       return;
     }
-    // Subscribe to Firestore orders for this user
     const ordersRef = collection(db, "orders");
     const q = query(ordersRef, where("customerId", "==", currentUser.uid));
     const unsubscribe = onSnapshot(q, snapshot => {
@@ -75,7 +76,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       const savedOrder: Order = {
         id: docRef.id,
         ...newOrder,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       } as unknown as Order;
       toast({
         title: "Order created",
@@ -95,6 +96,26 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
   const getOrderById = (id: string) => {
     return orders.find(order => order.id === id);
+  };
+
+  const getAllOrders = async (): Promise<Order[]> => {
+    try {
+      const ordersRef = collection(db, "orders");
+      const snapshot = await getDocs(ordersRef);
+      const allOrders: Order[] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...(doc.data() as Omit<Order, 'id'>),
+      }));
+      return allOrders;
+    } catch (error) {
+      console.error("Error fetching all orders:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch orders. Please try again.",
+        variant: "destructive",
+      });
+      return [];
+    }
   };
 
   const updateOrderStatus = async (id: string, status: OrderStatus) => {
@@ -137,6 +158,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     orders,
     createOrder,
     getOrderById,
+    getAllOrders,
     updateOrderStatus,
     initiateReturn,
     reorder,

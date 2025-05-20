@@ -23,24 +23,24 @@ const shippingOptions: ShippingOption[] = [
   {
     id: "standard",
     name: "Standard Shipping",
-    price: 5.99,
-    estimatedDays: 5,
+    price: 200,
+    estimatedDays: 1,
     description: "Delivery within 3-5 business days",
   },
-  {
-    id: "express",
-    name: "Express Shipping",
-    price: 14.99,
-    estimatedDays: 2,
-    description: "Delivery within 1-2 business days",
-  },
-  {
-    id: "scheduled",
-    name: "Scheduled Delivery",
-    price: 19.99,
-    estimatedDays: 1,
-    description: "Choose your delivery date and time",
-  },
+  // {
+  //   id: "express",
+  //   name: "Express Shipping",
+  //   price: 14.99,
+  //   estimatedDays: 2,
+  //   description: "Delivery within 1-2 business days",
+  // },
+  // {
+  //   id: "scheduled",
+  //   name: "Scheduled Delivery",
+  //   price: 19.99,
+  //   estimatedDays: 1,
+  //   description: "Choose your delivery date and time",
+  // },
 ];
 
 const paymentMethods: PaymentMethod[] = [

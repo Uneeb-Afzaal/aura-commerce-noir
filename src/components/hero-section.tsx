@@ -3,8 +3,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import banner from "@/assets/images/banner2.png";
+import { useNavigate } from "react-router-dom";
 
 export function HeroSection() {
+  const navigate = useNavigate();
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: (i: number) => ({
@@ -79,10 +81,10 @@ export function HeroSection() {
             animate="visible"
             variants={fadeIn}
           >
-            <Button className="bg-gold hover:bg-gold-dark text-noir-900 px-8 py-6">
+            <Button onClick={()=>navigate('/shop')} className="bg-gold hover:bg-gold-dark text-noir-900 px-8 py-6">
               Shop Now
             </Button>
-            <Button variant="outline" className="border-gold text-gold hover:bg-gold/10 px-8 py-6">
+            <Button onClick={()=>navigate('/collections')}  variant="outline" className="border-gold text-gold hover:bg-gold/10 px-8 py-6">
               Explore Collections <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </motion.div>

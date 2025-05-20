@@ -4,10 +4,12 @@ import { ProductCard } from "./ui/product-card";
 import { getFeaturedProducts } from "@/lib/product-service";
 import { Product } from "@/types/index";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function FeaturedProducts() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
@@ -86,7 +88,7 @@ export function FeaturedProducts() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <button className="text-gold hover:text-gold-light border-b border-gold hover:border-gold-light pb-1 transition-colors">
+          <button onClick={()=>{navigate('/shop')}} className="text-gold hover:text-gold-light border-b border-gold hover:border-gold-light pb-1 transition-colors">
             View All Products
           </button>
         </motion.div>

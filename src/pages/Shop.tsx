@@ -1,12 +1,10 @@
-
-import { useState , useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { ProductCard } from "@/components/ui/product-card";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Search, Filter, ChevronDown, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -20,75 +18,6 @@ import {
 } from "@/components/ui/select";
 import { Product } from "@/types";
 
-// // Mock product data
-// const products = [
-//   {
-//     id: "1",
-//     name: "Oud Noir Intense",
-//     brand: "Sufianah",
-//     price: 215,
-//     imageUrl: "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=500&q=60",
-//     rating: 5
-//   },
-//   {
-//     id: "2",
-//     name: "Ambre Éternel",
-//     brand: "Exclusive",
-//     price: 175,
-//     imageUrl: "https://images.unsplash.com/photo-1557170334-a9086426b0c2?auto=format&fit=crop&w=500&q=60",
-//     rating: 4
-//   },
-//   {
-//     id: "3",
-//     name: "Velvet Rose & Gold",
-//     brand: "Sufianah",
-//     price: 195,
-//     imageUrl: "https://images.unsplash.com/photo-1587017539504-67cfbddac569?auto=format&fit=crop&w=500&q=60",
-//     rating: 5
-//   },
-//   {
-//     id: "4",
-//     name: "Bois de Santal",
-//     brand: "Luxury",
-//     price: 230,
-//     imageUrl: "https://images.unsplash.com/photo-1595425970377-c9393ee12689?auto=format&fit=crop&w=500&q=60",
-//     rating: 4
-//   },
-//   {
-//     id: "5",
-//     name: "Midnight Orchid",
-//     brand: "Sufianah",
-//     price: 185,
-//     imageUrl: "https://images.unsplash.com/photo-1615341805327-154891803c7f?auto=format&fit=crop&w=500&q=60",
-//     rating: 5
-//   },
-//   {
-//     id: "6",
-//     name: "Vetiver & Amber",
-//     brand: "Premium",
-//     price: 165,
-//     imageUrl: "https://images.unsplash.com/photo-1605651202774-7d573fd3f12d?auto=format&fit=crop&w=500&q=60",
-//     rating: 4
-//   },
-//   {
-//     id: "7",
-//     name: "Saffron Oud",
-//     brand: "Luxury",
-//     price: 260,
-//     imageUrl: "https://images.unsplash.com/photo-1608528577891-eb055944f2e7?auto=format&fit=crop&w=500&q=60",
-//     rating: 5
-//   },
-//   {
-//     id: "8",
-//     name: "Noir Absolu",
-//     brand: "Sufianah",
-//     price: 210,
-//     imageUrl: "https://images.unsplash.com/photo-1559783510-c056abca0733?auto=format&fit=crop&w=500&q=60",
-//     rating: 4
-//   },
-// ];
-
-// Filter categories
 const categories = [
   { id: "all", name: "All Fragrances" },
   { id: "men", name: "For Him" },
@@ -96,12 +25,11 @@ const categories = [
   { id: "unisex", name: "Unisex" },
 ];
 
-const brands = ["Sufianah", "Luxury", "Exclusive", "Premium"];
+const brands = ["Sufianah"]; 
 const sortOptions = [
   { value: "featured", label: "Featured" },
   { value: "price-asc", label: "Price: Low to High" },
   { value: "price-desc", label: "Price: High to Low" },
-  { value: "newest", label: "Newest First" },
   { value: "rating", label: "Highest Rated" },
 ];
 
@@ -110,15 +38,25 @@ const Shop = () => {
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
   const [sortBy, setSortBy] = useState("featured");
-  const [products, setProducts] = useState<Product[]>();
+  const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const toggleBrand = (brand: string) => {
     if (selectedBrands.includes(brand)) {
       setSelectedBrands(selectedBrands.filter(b => b !== brand));
     } else {
       setSelectedBrands([...selectedBrands, brand]);
+    }
+  };
+
+  const toggleRating = (rating: number) => {
+    if (selectedRatings.includes(rating)) {
+      setSelectedRatings(selectedRatings.filter(r => r !== rating));
+    } else {
+      setSelectedRatings([...selectedRatings, rating]);
     }
   };
 
@@ -136,6 +74,44 @@ const Shop = () => {
     };
     fetchProducts();
   }, []);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      // Search filter
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          product.brand.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Category filter (assuming products have a 'category' field)
+      const matchesCategory = selectedCategory === "all" || 
+                            (product.category && product.category.toLowerCase() === selectedCategory.toLowerCase());
+      
+      // Price filter
+      const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+      
+      // Brand filter
+      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
+      
+      // Rating filter
+      const matchesRating = selectedRatings.length === 0 || 
+                          selectedRatings.some(rating => Math.floor(product.rating) >= rating);
+      
+      return matchesSearch && matchesCategory && matchesPrice && matchesBrand && matchesRating;
+    });
+  }, [products, searchQuery, selectedCategory, priceRange, selectedBrands, selectedRatings]);
+
+  const sortedProducts = useMemo(() => {
+    const productsToSort = [...filteredProducts];
+    switch (sortBy) {
+      case "price-asc":
+        return productsToSort.sort((a, b) => a.price - b.price);
+      case "price-desc":
+        return productsToSort.sort((a, b) => b.price - a.price);
+      case "rating":
+        return productsToSort.sort((a, b) => b.rating - a.rating);
+      default: // "featured"
+        return productsToSort;
+    }
+  }, [filteredProducts, sortBy]);
 
   if (isLoading) {
     return (
@@ -193,6 +169,8 @@ const Shop = () => {
                 type="search" 
                 placeholder="Search fragrances..." 
                 className="bg-noir-800 border-noir-700 pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-noir-400" />
             </div>
@@ -256,9 +234,9 @@ const Shop = () => {
                 <h3 className="font-medium mb-4">Price Range</h3>
                 <div className="pt-4 pb-2">
                   <Slider
-                    defaultValue={[0, 500]}
+                    defaultValue={[0, 5000]}
                     min={0}
-                    max={500}
+                    max={5000}
                     step={10}
                     value={priceRange}
                     onValueChange={(values) => setPriceRange(values)}
@@ -296,7 +274,11 @@ const Shop = () => {
                 <div className="space-y-3">
                   {[5, 4, 3, 2, 1].map((rating) => (
                     <div key={rating} className="flex items-center">
-                      <Checkbox id={`rating-${rating}`} />
+                      <Checkbox 
+                        id={`rating-${rating}`}
+                        checked={selectedRatings.includes(rating)}
+                        onCheckedChange={() => toggleRating(rating)}
+                      />
                       <label
                         htmlFor={`rating-${rating}`}
                         className="ml-2 flex gap-1 items-center cursor-pointer"
@@ -317,32 +299,49 @@ const Shop = () => {
                   ))}
                 </div>
               </div>
-              
-              <Button className="w-full mt-6 bg-gold hover:bg-gold-dark text-noir-900">
-                Apply Filters
-              </Button>
             </motion.aside>
             
             {/* Products Grid */}
             <div className="flex-1">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {products.map((product, index) => (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.05 }}
+              {sortedProducts.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    {sortedProducts.map((product, index) => (
+                      <motion.div
+                        key={product.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: index * 0.05 }}
+                      >
+                        <ProductCard {...product} />
+                      </motion.div>
+                    ))}
+                  </div>
+                  
+                  <div className="flex justify-center mt-12">
+                    <Button className="bg-gold hover:bg-gold-dark text-noir-900 px-8">
+                      Load More
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <p className="text-noir-400 mb-4">No products match your filters</p>
+                  <Button 
+                    variant="outline" 
+                    className="border-noir-700"
+                    onClick={() => {
+                      setSelectedCategory("all");
+                      setPriceRange([0, 500]);
+                      setSelectedBrands([]);
+                      setSelectedRatings([]);
+                      setSearchQuery("");
+                    }}
                   >
-                    <ProductCard {...product} />
-                  </motion.div>
-                ))}
-              </div>
-              
-              <div className="flex justify-center mt-12">
-                <Button className="bg-gold hover:bg-gold-dark text-noir-900 px-8">
-                  Load More
-                </Button>
-              </div>
+                    Reset Filters
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>

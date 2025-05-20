@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useOrders } from "@/context/order-context";
 import { Order, OrderStatus } from "@/types";
 import { 
@@ -22,24 +22,77 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
+import { Timestamp } from "firebase/firestore";
 
 const OrderManagement = () => {
-  const { orders, updateOrderStatus } = useOrders();
+  const { getAllOrders, updateOrderStatus } = useOrders();
+  const [orders, setOrders] = useState<Order[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Filter orders based on search and status filter
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch =
-      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customerId.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || order.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  function parseDate(dateField: unknown): Date | null {
+    if (!dateField) return null;
+    
+    try {
+      // Handle Firestore timestamp objects
+      if (
+        typeof dateField === "object" &&
+        dateField !== null &&
+        "toDate" in dateField &&
+        typeof (dateField as any).toDate === "function"
+      ) {
+        return (dateField as any).toDate();
+      }
+      
+      // Handle raw timestamp objects
+      if (
+        typeof dateField === "object" &&
+        dateField !== null &&
+        "seconds" in (dateField as any) &&
+        typeof (dateField as any).seconds === "number"
+      ) {
+        return new Date((dateField as any).seconds * 1000);
+      }
+      
+      // Handle string dates in "Month Day, Year" format (e.g., "May 19, 2025")
+      if (typeof dateField === "string" && dateField.match(/^[A-Za-z]+\s\d{1,2},\s\d{4}$/)) {
+        return new Date(dateField);
+      }
+      
+      // Fallback for other date formats
+      const dt = new Date(dateField as any);
+      return isNaN(dt.getTime()) ? null : dt;
+    } catch {
+      return null;
+    }
+  }
 
+  useEffect(() => {
+    // define and immediately invoke an async fetch function
+    (async () => {
+      try {
+        const orders = await getAllOrders();
+        setOrders(orders);
+      } catch (err) {
+        console.error("Failed to load orders:", err);
+      }
+    })();
+  }, [getAllOrders]);
+
+  
+  // Memoize filtered orders so it's recalculated when dependencies change
+  const filteredOrders = useMemo(() => {
+    return orders.filter(order => {
+      const matchesSearch =
+        order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.customerId.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        statusFilter === "all" || order.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [orders, searchTerm, statusFilter]);
   // Sort orders by date (newest first)
   const sortedOrders = [...filteredOrders].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -104,7 +157,7 @@ const OrderManagement = () => {
         </div>
 
         <div className="ml-auto text-sm text-gray-400">
-          Total Orders: {filteredOrders.length}
+          Total Orders: {orders.length}
         </div>
       </div>
 
@@ -122,11 +175,17 @@ const OrderManagement = () => {
           </TableHeader>
           <TableBody>
             {sortedOrders.length > 0 ? (
-              sortedOrders.map((order) => (
+              sortedOrders.map((order) => {
+                const orderDate = parseDate(order.createdAt);
+                  return (
                 <TableRow key={order.id} className="border-gray-800 hover:bg-gray-900">
                   <TableCell>{order.id}</TableCell>
                   <TableCell>
-                    {new Date(order.createdAt).toLocaleDateString()}
+                  {orderDate ? orderDate.toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    }) : "N/A"}
                   </TableCell>
                   <TableCell>{order.shippingAddress.fullName}</TableCell>
                   <TableCell>PKR {order.totalAmount.toFixed(2)}</TableCell>
@@ -162,7 +221,8 @@ const OrderManagement = () => {
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))
+                  )
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-10 text-gray-400">
@@ -190,7 +250,11 @@ const OrderManagement = () => {
                   <h3 className="text-sm font-medium text-gray-400">Order Information</h3>
                   <p className="font-medium">ID: {selectedOrder.id}</p>
                   <p>
-                    Date: {new Date(selectedOrder.createdAt).toLocaleDateString()}
+                    Date: { parseDate(selectedOrder.createdAt) ?  parseDate(selectedOrder.createdAt).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    }) : "N/A"}
                   </p>
                   <p>Payment Method: {selectedOrder.paymentMethod}</p>
                   <Badge variant="outline" className={getStatusColor(selectedOrder.status)}>
