@@ -456,7 +456,7 @@ const ProductManagement = () => {
 
       {/* Edit Product Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="bg-gray-900 border-gray-800">
+        <DialogContent className="bg-gray-900 border-gray-800 max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
             <DialogDescription>Update the product details.</DialogDescription>
