@@ -75,11 +75,11 @@ export function Footer() {
             <div className="mt-6 space-y-3">
               <div className="flex items-center text-sm text-noir-300">
                 <MapPin className="h-4 w-4 mr-2 text-gold" />
-                <span>1234 Park Avenue, New York</span>
+                <span>Sunflower Plaza 4 Johar Town</span>
               </div>
               <div className="flex items-center text-sm text-noir-300">
                 <Phone className="h-4 w-4 mr-2 text-gold" />
-                <span>+1 (555) 123-4567</span>
+                <span>0300 7216004</span>
               </div>
               <div className="flex items-center text-sm text-noir-300">
                 <Mail className="h-4 w-4 mr-2 text-gold" />

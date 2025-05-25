@@ -206,7 +206,7 @@ if (isInWishlist(product.id)) {
             </div>
             <div className="mb-8">
               <span className="text-2xl text-gold">
-                ${product.price.toFixed(2)}
+                PKR {product.price.toFixed(2)}
               </span>
             </div>
             <p className="text-noir-200 mb-8">{product.description}</p>

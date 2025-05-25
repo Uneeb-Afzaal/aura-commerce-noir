@@ -44,10 +44,10 @@ const Index = () => {
                   The Art of <span className="text-gold">Fragrance</span>
                 </h2>
                 <p className="text-noir-100 mb-6">
-                  At Sufianah, we believe fragrance is more than just a scent; it's an expression of individuality and a powerful trigger of memories and emotions.
+                At Sufianah, we believe fragrance is not just a scent, but a divine whisper that echoes the depths of the soul. It is an ethereal essence that transcends time and space, unlocking forgotten memories and stirring emotions with every breath.
                 </p>
                 <p className="text-noir-200 mb-8">
-                  Our master perfumers blend rare and precious ingredients from around the world to create unique compositions that evolve with your personal chemistry, resulting in a truly individual olfactory signature.
+                Rooted in the ancient wisdom of Sufism, our master perfumers craft each fragrance as a mystical journey—blending rare and sacred ingredients from distant lands to create compositions that resonate with your spirit. As you wear each scent, it unfolds like the pages of a spiritual manuscript, evolving with your essence to form a unique, eternal olfactory signature—a fragrance as individual as the journey of your soul.
                 </p>
                 <button className="text-gold hover:text-gold-light border-b border-gold hover:border-gold-light pb-1 transition-colors">
                   Discover Our Craftsmanship

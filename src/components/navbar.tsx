@@ -2,7 +2,7 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Search, ShoppingCart, User, Menu, X, Heart } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, Heart , ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -72,13 +72,15 @@ export function Navbar() {
                   <Logo className="mb-8" />
                   <nav className="space-y-6">
                     {navLinks.map((link) => (
-                      <Link
-                        key={link.path}
-                        to={link.path}
-                        className="block py-2 text-foreground hover:text-gold transition-colors"
-                      >
-                        {link.name}
-                      </Link>
+                      <motion.div whileHover={{ scale: 1.2, transition: { duration: 0.4 } }}>
+                        <Link
+                          key={link.path}
+                          to={link.path}
+                          className="text-sm text-foreground hover:text-gold transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-gold after:transition-all hover:after:w-full"
+                        >
+                          {link.name}
+                        </Link>
+                      </motion.div>
                     ))}
                   </nav>
                 </div>
@@ -90,15 +92,54 @@ export function Navbar() {
           
           {!isMobile && (
             <nav className="hidden lg:flex items-center space-x-6">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className="text-sm text-foreground hover:text-gold transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-gold after:transition-all hover:after:w-full"
-                >
-                  {link.name}
-                </Link>
-              ))}
+               <motion.div whileHover={{ scale: 1.2, transition: { duration: 0.4 } }}>
+              <Link to="/" className="text-sm font-bold text-foreground hover:text-gold transition-colors">
+                Home
+              </Link>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.2, transition: { duration: 0.4 } }}>
+              <div className="relative group">
+                <button className="text-sm font-bold text-foreground hover:text-gold transition-colors flex items-center gap-1">
+                  Shop
+                  <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180" />
+                </button>
+                <div className="absolute left-0 mt-2 w-48 bg-noir-800 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="py-1">
+                    <Link 
+                      to="/shop?category=men" 
+                      className="block px-4 py-2 text-sm text-foreground hover:bg-noir-700 hover:text-gold"
+                    >
+                      For Him
+                    </Link>
+                    <Link 
+                      to="/shop?category=women" 
+                      className="block px-4 py-2 text-sm text-foreground hover:bg-noir-700 hover:text-gold"
+                    >
+                      For Her
+                    </Link>
+                    <Link 
+                      to="/shop?category=unisex" 
+                      className="block px-4 py-2 text-sm text-foreground hover:bg-noir-700 hover:text-gold"
+                    >
+                      Unisex
+                    </Link>
+                  </div>
+                </div>
+              </div>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.2, transition: { duration: 0.4 } }}>
+              <Link to="/collections" className="text-sm font-bold text-foreground hover:text-gold transition-colors">
+                Collections
+              </Link>
+              </motion.div>
+
+              <motion.div whileHover={{ scale: 1.2, transition: { duration: 0.4 } }}>
+              <Link to="/about" className="text-sm font-bold text-foreground hover:text-gold transition-colors">
+                About
+              </Link>
+              </motion.div>
             </nav>
           )}
         </div>

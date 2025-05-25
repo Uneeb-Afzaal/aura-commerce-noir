@@ -17,6 +17,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Product } from "@/types";
+import { useSearchParams } from 'react-router-dom';
 
 const categories = [
   { id: "all", name: "All Fragrances" },
@@ -34,8 +35,48 @@ const sortOptions = [
 ];
 
 const Shop = () => {
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [priceRange, setPriceRange] = useState([0, 500]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlCategory = searchParams.get('category');
+  
+  // Initialize selectedCategory with URL parameter if present
+  const [selectedCategory, setSelectedCategory] = useState(urlCategory || 'all');
+  
+  // Update selectedCategory when URL changes
+  useEffect(() => {
+    if (urlCategory) {
+      setSelectedCategory(urlCategory);
+    }
+  }, [urlCategory]);
+  
+  // Update URL when category changes
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    if (category === 'all') {
+      searchParams.delete('category');
+    } else {
+      searchParams.set('category', category);
+    }
+    setSearchParams(searchParams);
+  };
+  
+  // Modify the category buttons to use handleCategoryChange
+  {categories.map((category) => (
+    <button
+      key={category.id}
+      className={`block w-full text-left px-2 py-1.5 rounded-md transition-colors ${
+        selectedCategory === category.id
+          ? "bg-gold/10 text-gold"
+          : "hover:bg-noir-700"
+      }`}
+      onClick={() => handleCategoryChange(category.id)}
+    >
+      {category.name}
+      {selectedCategory === category.id && (
+        <ChevronRight className="inline-block h-4 w-4 ml-2" />
+      )}
+    </button>
+  ))}
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
@@ -154,7 +195,7 @@ const Shop = () => {
             <div>
               <h1 className="text-3xl md:text-5xl font-light mb-4">Shop <span className="text-gold">Fragrances</span></h1>
               <p className="text-noir-100 max-w-xl">
-                Explore our exquisite collection of luxury fragrances crafted to captivate the senses and leave an unforgettable impression.
+              Experience the divine harmony of Sufianah’s luxurious scents, crafted to elevate the soul and leave a lasting, spiritual impression. Each fragrance is a journey of elegance, designed to captivate and inspire.
               </p>
             </div>
           </div>
@@ -234,9 +275,9 @@ const Shop = () => {
                 <h3 className="font-medium mb-4">Price Range</h3>
                 <div className="pt-4 pb-2">
                   <Slider
-                    defaultValue={[0, 5000]}
+                    defaultValue={[0, 10000]}
                     min={0}
-                    max={5000}
+                    max={50000}
                     step={10}
                     value={priceRange}
                     onValueChange={(values) => setPriceRange(values)}
@@ -332,7 +373,7 @@ const Shop = () => {
                     className="border-noir-700"
                     onClick={() => {
                       setSelectedCategory("all");
-                      setPriceRange([0, 500]);
+                      setPriceRange([0, 10000]);
                       setSelectedBrands([]);
                       setSelectedRatings([]);
                       setSearchQuery("");
