@@ -31,6 +31,7 @@ import OrderTracking from "./pages/OrderTracking";
 import About from './pages/About';
 import Collections from "./pages/Collection";
 import { AppProvider } from "./context/auth-centext";
+import PackageDetail from "./pages/PackageDetail";
 
 
 const queryClient = new QueryClient();
@@ -61,6 +62,7 @@ const App = () => (
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/about" element={<About/>}/>
                     <Route path="/collection" element={<Collections/>}/>
+                    <Route path="/package/:id" element={<PackageDetail/>}/>
                     
                     {/* Admin Routes */}
                     <Route path="/admin/login" element={<AdminLogin />} />

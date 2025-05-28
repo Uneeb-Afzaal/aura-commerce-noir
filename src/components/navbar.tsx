@@ -46,6 +46,9 @@ export function Navbar() {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Shop", path: "/shop" },
+    {name: "Men" , path: "/shop?category=men"},
+    {name: "Women" , path: "/shop?category=women"},
+    {name: "Unisex" , path: "/shop?category=unisex"},
     { name: "Collections", path: "/collections" },
     { name: "About", path: "/about" },
   ];

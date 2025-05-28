@@ -8,6 +8,7 @@ import { NewsletterSection } from "@/components/newsletter-section";
 import { Footer } from "@/components/footer";
 import banner from "@/assets/images/banner.png";
 
+
 const Index = () => {
   return (
     <div className="min-h-screen bg-noir-900 text-foreground">

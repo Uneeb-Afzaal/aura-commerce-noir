@@ -14,6 +14,8 @@ interface ProductCardProps {
   price: number;
   imageUrl: string;
   rating: number;
+  volume: string;
+  isPackage: boolean;
   className?: string;
 }
 
@@ -24,6 +26,8 @@ export function ProductCard({
   price,
   imageUrl,
   rating,
+  volume,
+  isPackage,
   className,
 }: ProductCardProps) {
   const router = useNavigate();
@@ -32,7 +36,7 @@ export function ProductCard({
 
   const handleWishlistClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    const product: Product = { id, name, brand, price, imageUrl, rating };
+    const product: Product = { id, name, brand, price, imageUrl: [imageUrl , imageUrl , imageUrl , imageUrl], rating , volume };
     if (isInWishlist(id)) {
       removeFromWishlist(id);
     } else {
@@ -42,13 +46,17 @@ export function ProductCard({
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    const product: Product = { id, name, brand, price, imageUrl, rating };
+    const product: Product = { id, name, brand, price, imageUrl: [imageUrl , imageUrl , imageUrl , imageUrl] , rating , volume };
     addItem(product);
   };
 
   return (
     <motion.div
-      onClick={() => router(`/product/${id}`)}
+      onClick={() => {
+        if(isPackage) return router(`/package/${id}`)
+          else
+        return router(`/product/${id}`)}}
+      
       className={cn(
         "group relative overflow-hidden rounded-md bg-noir-700 border border-noir-600 flex flex-col cursor-pointer",
         className

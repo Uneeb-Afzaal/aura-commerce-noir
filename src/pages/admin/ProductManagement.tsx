@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Product } from "@/types";
 
@@ -50,6 +51,8 @@ const ProductManagement = () => {
     heartNotes: ["", "", ""],
     baseNotes: ["", "", ""],
     topNotes: ["", "", ""],
+    isPackage: false,
+    packageImages: ["", "", ""]
   });
 
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
@@ -74,12 +77,18 @@ const ProductManagement = () => {
       heartNotes: ["", "", ""],
       baseNotes: ["", "", ""],
       topNotes: ["", "", ""],
+      isPackage: false,
+      packageImages: ["", "", ""]
     });
     setIsAddDialogOpen(false);
   };
 
   const handleEditClick = (product: Product) => {
-    setCurrentProduct({ ...product });
+    setCurrentProduct({ 
+      ...product,
+      isPackage: product.isPackage || false,
+      packageImages: product.packageImages || ["", "", ""]
+    });
     setIsEditDialogOpen(true);
   };
 
@@ -94,6 +103,28 @@ const ProductManagement = () => {
 
   const handleDeleteClick = (id: string) => {
     deleteProduct(id);
+  };
+
+  const handlePackageToggle = (checked: boolean, isEdit: boolean = false) => {
+    if (isEdit && currentProduct) {
+      setCurrentProduct({
+        ...currentProduct,
+        isPackage: checked,
+        packageImages: checked ? currentProduct.packageImages || ["", "", ""] : ["", "", ""],
+        heartNotes: checked ? ["", "", ""] : currentProduct.heartNotes,
+        baseNotes: checked ? ["", "", ""] : currentProduct.baseNotes,
+        topNotes: checked ? ["", "", ""] : currentProduct.topNotes,
+      });
+    } else {
+      setNewProduct({
+        ...newProduct,
+        isPackage: checked,
+        packageImages: checked ? newProduct.packageImages || ["", "", ""] : ["", "", ""],
+        heartNotes: checked ? ["", "", ""] : newProduct.heartNotes,
+        baseNotes: checked ? ["", "", ""] : newProduct.baseNotes,
+        topNotes: checked ? ["", "", ""] : newProduct.topNotes,
+      });
+    }
   };
 
   return (
@@ -115,6 +146,18 @@ const ProductManagement = () => {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleAddSubmit} className="space-y-4">
+              {/* Package Option */}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="package-checkbox"
+                  checked={newProduct.isPackage}
+                  onCheckedChange={(checked) => handlePackageToggle(checked as boolean)}
+                />
+                <label htmlFor="package-checkbox" className="text-sm font-medium cursor-pointer">
+                  This is a package (requires 3 additional images instead of fragrance notes)
+                </label>
+              </div>
+
               {/* Basic Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -195,7 +238,7 @@ const ProductManagement = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label htmlFor="imageUrl" className="text-sm font-medium">
-                    Image URL
+                    Main Image URL
                   </label>
                   <Input
                     id="imageUrl"
@@ -293,62 +336,86 @@ const ProductManagement = () => {
                 </Select>
               </div>
 
-              {/* Heart Notes */}
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Heart Notes (3 ingredients)</p>
-                {newProduct.heartNotes.map((note, idx) => (
-                  <Input
-                    key={idx}
-                    placeholder={`Heart Note ${idx + 1}`}
-                    value={note}
-                    onChange={(e) => {
-                      const notes = [...newProduct.heartNotes] as [string, string, string];
-                      notes[idx] = e.target.value;
-                      setNewProduct({ ...newProduct, heartNotes: notes });
-                    }}
-                    required
-                    className="bg-gray-800 border-gray-700"
-                  />
-                ))}
-              </div>
+              {/* Conditional rendering based on package option */}
+              {newProduct.isPackage ? (
+                // Package Images
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Package Images (3 required)</p>
+                  {newProduct.packageImages?.map((image, idx) => (
+                    <Input
+                      key={idx}
+                      placeholder={`Package Image ${idx + 1} URL`}
+                      value={image}
+                      onChange={(e) => {
+                        const images = [...(newProduct.packageImages || ["", "", ""])];
+                        images[idx] = e.target.value;
+                        setNewProduct({ ...newProduct, packageImages: images as [string, string, string]  });
+                      }}
+                      required
+                      className="bg-gray-800 border-gray-700"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {/* Heart Notes */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Heart Notes (3 ingredients)</p>
+                    {newProduct.heartNotes.map((note, idx) => (
+                      <Input
+                        key={idx}
+                        placeholder={`Heart Note ${idx + 1}`}
+                        value={note}
+                        onChange={(e) => {
+                          const notes = [...newProduct.heartNotes] as [string, string, string];
+                          notes[idx] = e.target.value;
+                          setNewProduct({ ...newProduct, heartNotes: notes });
+                        }}
+                        required
+                        className="bg-gray-800 border-gray-700"
+                      />
+                    ))}
+                  </div>
 
-              {/* Base Notes */}
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Base Notes (3 ingredients)</p>
-                {newProduct.baseNotes.map((note, idx) => (
-                  <Input
-                    key={idx}
-                    placeholder={`Base Note ${idx + 1}`}
-                    value={note}
-                    onChange={(e) => {
-                      const notes = [...newProduct.baseNotes] as [string, string, string];
-                      notes[idx] = e.target.value;
-                      setNewProduct({ ...newProduct, baseNotes: notes });
-                    }}
-                    required
-                    className="bg-gray-800 border-gray-700"
-                  />
-                ))}
-              </div>
+                  {/* Base Notes */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Base Notes (3 ingredients)</p>
+                    {newProduct.baseNotes.map((note, idx) => (
+                      <Input
+                        key={idx}
+                        placeholder={`Base Note ${idx + 1}`}
+                        value={note}
+                        onChange={(e) => {
+                          const notes = [...newProduct.baseNotes] as [string, string, string];
+                          notes[idx] = e.target.value;
+                          setNewProduct({ ...newProduct, baseNotes: notes });
+                        }}
+                        required
+                        className="bg-gray-800 border-gray-700"
+                      />
+                    ))}
+                  </div>
 
-              {/* Top Notes */}
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Top Notes (3 ingredients)</p>
-                {newProduct.topNotes.map((note, idx) => (
-                  <Input
-                    key={idx}
-                    placeholder={`Top Note ${idx + 1}`}
-                    value={note}
-                    onChange={(e) => {
-                      const notes = [...newProduct.topNotes] as [string, string, string];
-                      notes[idx] = e.target.value;
-                      setNewProduct({ ...newProduct, topNotes: notes });
-                    }}
-                    required
-                    className="bg-gray-800 border-gray-700"
-                  />
-                ))}
-              </div>
+                  {/* Top Notes */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Top Notes (3 ingredients)</p>
+                    {newProduct.topNotes.map((note, idx) => (
+                      <Input
+                        key={idx}
+                        placeholder={`Top Note ${idx + 1}`}
+                        value={note}
+                        onChange={(e) => {
+                          const notes = [...newProduct.topNotes] as [string, string, string];
+                          notes[idx] = e.target.value;
+                          setNewProduct({ ...newProduct, topNotes: notes });
+                        }}
+                        required
+                        className="bg-gray-800 border-gray-700"
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
 
               <DialogFooter>
                 <Button
@@ -381,6 +448,7 @@ const ProductManagement = () => {
             <TableRow className="bg-gray-900 hover:bg-gray-900">
               <TableHead>Product</TableHead>
               <TableHead>Category</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Stock</TableHead>
               <TableHead>Actions</TableHead>
@@ -408,6 +476,11 @@ const ProductManagement = () => {
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{product.category}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={product.isPackage ? "default" : "secondary"}>
+                      {product.isPackage ? "Package" : "Single"}
+                    </Badge>
                   </TableCell>
                   <TableCell>PKR {product.price.toFixed(2)}</TableCell>
                   <TableCell>
@@ -445,7 +518,7 @@ const ProductManagement = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-10 text-gray-400">
+                <TableCell colSpan={6} className="text-center py-10 text-gray-400">
                   No products found
                 </TableCell>
               </TableRow>
@@ -462,227 +535,263 @@ const ProductManagement = () => {
             <DialogDescription>Update the product details.</DialogDescription>
           </DialogHeader>
           {currentProduct && (
-  <form onSubmit={handleEditSubmit} className="space-y-4">
-    {/* Name & Brand */}
-    <div className="grid grid-cols-2 gap-4">
-      <div className="space-y-2">
-        <label htmlFor="edit-name" className="text-sm font-medium">Name</label>
-        <Input
-          id="edit-name"
-          value={currentProduct.name}
-          onChange={e =>
-            setCurrentProduct({ ...currentProduct, name: e.target.value })
-          }
-          required
-          className="bg-gray-800 border-gray-700"
-        />
-      </div>
-      <div className="space-y-2">
-        <label htmlFor="edit-brand" className="text-sm font-medium">Brand</label>
-        <Input
-          id="edit-brand"
-          value={currentProduct.brand}
-          onChange={e =>
-            setCurrentProduct({ ...currentProduct, brand: e.target.value })
-          }
-          required
-          className="bg-gray-800 border-gray-700"
-        />
-      </div>
-    </div>
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              {/* Package Option */}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="edit-package-checkbox"
+                  checked={currentProduct.isPackage}
+                  onCheckedChange={(checked) => handlePackageToggle(checked as boolean, true)}
+                />
+                <label htmlFor="edit-package-checkbox" className="text-sm font-medium cursor-pointer">
+                  This is a package (requires 3 additional images instead of fragrance notes)
+                </label>
+              </div>
 
-    {/* Price & Category */}
-    <div className="grid grid-cols-2 gap-4">
-      <div className="space-y-2">
-        <label htmlFor="edit-price" className="text-sm font-medium">Price</label>
-        <Input
-          id="edit-price"
-          type="number"
-          min="0"
-          step="0.01"
-          value={currentProduct.price}
-          onChange={e =>
-            setCurrentProduct({
-              ...currentProduct,
-              price: parseFloat(e.target.value) || 0,
-            })
-          }
-          required
-          className="bg-gray-800 border-gray-700"
-        />
-      </div>
-      <div className="space-y-2">
-        <label htmlFor="edit-category" className="text-sm font-medium">Category</label>
-        <Select
-          value={currentProduct.category}
-          onValueChange={v =>
-            setCurrentProduct({ ...currentProduct, category: v })
-          }
-        >
-          <SelectTrigger id="edit-category" className="bg-gray-800 border-gray-700">
-            <SelectValue placeholder="Select category" />
-          </SelectTrigger>
-          <SelectContent className="bg-gray-900 border-gray-800">
-            <SelectItem value="men">Men</SelectItem>
-            <SelectItem value="women">Women</SelectItem>
-            <SelectItem value="unisex">Unisex</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
+              {/* Name & Brand */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label htmlFor="edit-name" className="text-sm font-medium">Name</label>
+                  <Input
+                    id="edit-name"
+                    value={currentProduct.name}
+                    onChange={e =>
+                      setCurrentProduct({ ...currentProduct, name: e.target.value })
+                    }
+                    required
+                    className="bg-gray-800 border-gray-700"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="edit-brand" className="text-sm font-medium">Brand</label>
+                  <Input
+                    id="edit-brand"
+                    value={currentProduct.brand}
+                    onChange={e =>
+                      setCurrentProduct({ ...currentProduct, brand: e.target.value })
+                    }
+                    required
+                    className="bg-gray-800 border-gray-700"
+                  />
+                </div>
+              </div>
 
-    {/* Image URL & Stock */}
-    <div className="grid grid-cols-2 gap-4">
-      <div className="space-y-2">
-        <label htmlFor="edit-imageUrl" className="text-sm font-medium">Image URL</label>
-        <Input
-          id="edit-imageUrl"
-          value={currentProduct.imageUrl}
-          onChange={e =>
-            setCurrentProduct({ ...currentProduct, imageUrl: e.target.value })
-          }
-          required
-          className="bg-gray-800 border-gray-700"
-        />
-      </div>
-      <div className="space-y-2">
-        <label htmlFor="edit-stock" className="text-sm font-medium">Stock</label>
-        <Input
-          id="edit-stock"
-          type="number"
-          min="0"
-          value={currentProduct.stock}
-          onChange={e =>
-            setCurrentProduct({
-              ...currentProduct,
-              stock: parseInt(e.target.value) || 0,
-            })
-          }
-          required
-          className="bg-gray-800 border-gray-700"
-        />
-      </div>
-    </div>
+              {/* Price & Category */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label htmlFor="edit-price" className="text-sm font-medium">Price</label>
+                  <Input
+                    id="edit-price"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={currentProduct.price}
+                    onChange={e =>
+                      setCurrentProduct({
+                        ...currentProduct,
+                        price: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                    required
+                    className="bg-gray-800 border-gray-700"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="edit-category" className="text-sm font-medium">Category</label>
+                  <Select
+                    value={currentProduct.category}
+                    onValueChange={v =>
+                      setCurrentProduct({ ...currentProduct, category: v })
+                    }
+                  >
+                    <SelectTrigger id="edit-category" className="bg-gray-800 border-gray-700">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-900 border-gray-800">
+                      <SelectItem value="men">Men</SelectItem>
+                      <SelectItem value="women">Women</SelectItem>
+                      <SelectItem value="unisex">Unisex</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-    {/* Rating */}
-    <div className="space-y-2">
-      <label htmlFor="edit-rating" className="text-sm font-medium">Rating (1–5)</label>
-      <Input
-        id="edit-rating"
-        type="number"
-        min="1"
-        max="5"
-        value={currentProduct.rating}
-        onChange={e =>
-          setCurrentProduct({
-            ...currentProduct,
-            rating: parseInt(e.target.value) || 0,
-          })
-        }
-        required
-        className="bg-gray-800 border-gray-700"
-      />
-    </div>
+              {/* Image URL & Stock */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label htmlFor="edit-imageUrl" className="text-sm font-medium">Main Image URL</label>
+                  <Input
+                    id="edit-imageUrl"
+                    value={currentProduct.imageUrl}
+                    onChange={e =>
+                      setCurrentProduct({ ...currentProduct, imageUrl: e.target.value })
+                    }
+                    required
+                    className="bg-gray-800 border-gray-700"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="edit-stock" className="text-sm font-medium">Stock</label>
+                  <Input
+                    id="edit-stock"
+                    type="number"
+                    min="0"
+                    value={currentProduct.stock}
+                    onChange={e =>
+                      setCurrentProduct({
+                        ...currentProduct,
+                        stock: parseInt(e.target.value) || 0,
+                      })
+                    }
+                    required
+                    className="bg-gray-800 border-gray-700"
+                  />
+                </div>
+              </div>
 
-    {/* Description */}
-    <div className="space-y-2">
-      <label htmlFor="edit-description" className="text-sm font-medium">Description</label>
-      <Textarea
-        id="edit-description"
-        value={currentProduct.description}
-        onChange={e =>
-          setCurrentProduct({ ...currentProduct, description: e.target.value })
-        }
-        required
-        className="bg-gray-800 border-gray-700"
-      />
-    </div>
+              {/* Rating */}
+              <div className="space-y-2">
+                <label htmlFor="edit-rating" className="text-sm font-medium">Rating (1–5)</label>
+                <Input
+                  id="edit-rating"
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={currentProduct.rating}
+                  onChange={e =>
+                    setCurrentProduct({
+                      ...currentProduct,
+                      rating: parseInt(e.target.value) || 0,
+                    })
+                  }
+                  required
+                  className="bg-gray-800 border-gray-700"
+                />
+              </div>
 
-    {/* Volume */}
-    <div className="space-y-2">
-      <label htmlFor="edit-volume" className="text-sm font-medium">Volume</label>
-      <Select
-        value={currentProduct.volume}
-        onValueChange={v =>
-          setCurrentProduct({ ...currentProduct, volume: v })
-        }
-      >
-        <SelectTrigger id="edit-volume" className="bg-gray-800 border-gray-700">
-          <SelectValue placeholder="Select volume" />
-        </SelectTrigger>
-        <SelectContent className="bg-gray-900 border-gray-800">
-          <SelectItem value="3ml">3 ml</SelectItem>
-          <SelectItem value="5ml">5 ml</SelectItem>
-          <SelectItem value="10ml">10 ml</SelectItem>
-          <SelectItem value="15ml">15 ml</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+              {/* Description */}
+              <div className="space-y-2">
+                <label htmlFor="edit-description" className="text-sm font-medium">Description</label>
+                <Textarea
+                  id="edit-description"
+                  value={currentProduct.description}
+                  onChange={e =>
+                    setCurrentProduct({ ...currentProduct, description: e.target.value })
+                  }
+                  required
+                  className="bg-gray-800 border-gray-700"
+                />
+              </div>
 
-    {/* Heart Notes */}
-    <div className="space-y-2">
-      <p className="text-sm font-medium">Heart Notes (3)</p>
-      {currentProduct.heartNotes.map((n, i) => (
-        <Input
-          key={i}
-          placeholder={`Heart Note ${i + 1}`}
-          value={n}
-          onChange={e => {
-            const notes = [...currentProduct.heartNotes] as [string,string,string];
-            notes[i] = e.target.value;
-            setCurrentProduct({ ...currentProduct, heartNotes: notes });
-          }}
-          required
-          className="bg-gray-800 border-gray-700"
-        />
-      ))}
-    </div>
+              {/* Volume */}
+              <div className="space-y-2">
+                <label htmlFor="edit-volume" className="text-sm font-medium">Volume</label>
+                <Select
+                  value={currentProduct.volume}
+                  onValueChange={v =>
+                    setCurrentProduct({ ...currentProduct, volume: v })
+                  }
+                >
+                  <SelectTrigger id="edit-volume" className="bg-gray-800 border-gray-700">
+                    <SelectValue placeholder="Select volume" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-900 border-gray-800">
+                    <SelectItem value="3ml">3 ml</SelectItem>
+                    <SelectItem value="5ml">5 ml</SelectItem>
+                    <SelectItem value="10ml">10 ml</SelectItem>
+                    <SelectItem value="15ml">15 ml</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-    {/* Base Notes */}
-    <div className="space-y-2">
-      <p className="text-sm font-medium">Base Notes (3)</p>
-      {currentProduct.baseNotes.map((n, i) => (
-        <Input
-          key={i}
-          placeholder={`Base Note ${i + 1}`}
-          value={n}
-          onChange={e => {
-            const notes = [...currentProduct.baseNotes] as [string,string,string];
-            notes[i] = e.target.value;
-            setCurrentProduct({ ...currentProduct, baseNotes: notes });
-          }}
-          required
-          className="bg-gray-800 border-gray-700"
-        />
-      ))}
-    </div>
+              {/* Conditional rendering based on package option */}
+              {currentProduct.isPackage ? (
+                // Package Images
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Package Images (3 required)</p>
+                  {currentProduct.packageImages?.map((image, i) => (
+                    <Input
+                      key={i}
+                      placeholder={`Package Image ${i + 1} URL`}
+                      value={image}
+                      onChange={e => {
+                        const images = [...(currentProduct.packageImages || ["", "", ""])];
+                        images[i] = e.target.value;
+                        setCurrentProduct({ ...currentProduct, packageImages: images as [string,string,string]  });
+                      }}
+                      required
+                      className="bg-gray-800 border-gray-700"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {/* Heart Notes */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Heart Notes (3)</p>
+                    {currentProduct.heartNotes.map((n, i) => (
+                      <Input
+                        key={i}
+                        placeholder={`Heart Note ${i + 1}`}
+                        value={n}
+                        onChange={e => {
+                          const notes = [...currentProduct.heartNotes] as [string,string,string];
+                          notes[i] = e.target.value;
+                          setCurrentProduct({ ...currentProduct, heartNotes: notes });
+                        }}
+                        required
+                        className="bg-gray-800 border-gray-700"
+                      />
+                    ))}
+                  </div>
 
-    {/* Top Notes */}
-    <div className="space-y-2">
-      <p className="text-sm font-medium">Top Notes (3)</p>
-      {currentProduct.topNotes.map((n, i) => (
-        <Input
-          key={i}
-          placeholder={`Top Note ${i + 1}`}
-          value={n}
-          onChange={e => {
-            const notes = [...currentProduct.topNotes] as [string,string,string];
-            notes[i] = e.target.value;
-            setCurrentProduct({ ...currentProduct, topNotes: notes });
-          }}
-          required
-          className="bg-gray-800 border-gray-700"
-        />
-      ))}
-    </div>
+                  {/* Base Notes */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Base Notes (3)</p>
+                    {currentProduct.baseNotes.map((n, i) => (
+                      <Input
+                        key={i}
+                        placeholder={`Base Note ${i + 1}`}
+                        value={n}
+                        onChange={e => {
+                          const notes = [...currentProduct.baseNotes] as [string,string,string];
+                          notes[i] = e.target.value;
+                          setCurrentProduct({ ...currentProduct, baseNotes: notes });
+                        }}
+                        required
+                        className="bg-gray-800 border-gray-700"
+                      />
+                    ))}
+                  </div>
 
-    <DialogFooter>
-      <Button type="submit" className="bg-[#FFD700] hover:bg-[#F5CB00] text-black">
-        Update Product
-      </Button>
-    </DialogFooter>
-  </form>
-)}
+                  {/* Top Notes */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Top Notes (3)</p>
+                    {currentProduct.topNotes.map((n, i) => (
+                      <Input
+                        key={i}
+                        placeholder={`Top Note ${i + 1}`}
+                        value={n}
+                        onChange={e => {
+                          const notes = [...currentProduct.topNotes] as [string,string,string];
+                          notes[i] = e.target.value;
+                          setCurrentProduct({ ...currentProduct, topNotes: notes });
+                        }}
+                        required
+                        className="bg-gray-800 border-gray-700"
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+
+              <DialogFooter>
+                <Button type="submit" className="bg-[#FFD700] hover:bg-[#F5CB00] text-black">
+                  Update Product
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
     </div>

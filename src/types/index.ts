@@ -10,9 +10,11 @@ export interface Product {
   category?: string;
   stock?: number;
   volume: string;
-  heartNotes: [string, string, string];
-  baseNotes:  [string, string, string];
-  topNotes:   [string, string, string];
+  isPackage?: boolean;
+  packageImages? : [string, string, string];
+  heartNotes?: [string, string, string];
+  baseNotes?:  [string, string, string];
+  topNotes?:   [string, string, string];
 }
 
 export interface CartItem extends Product {

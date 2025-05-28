@@ -12,12 +12,7 @@ import {
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Product } from "@/types";
 import { getProductById } from "@/lib/product-service";
 import { useCart } from "@/context/cart-context";
@@ -36,19 +31,32 @@ import {
   orderBy,
 } from "firebase/firestore";
 
-const ProductDetail: React.FC = () => {
+// Import Carousel components
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+
+const fallbackImage = "https://via.placeholder.com/200x200?text=Image+Not+Found";
+
+const PackageDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [imageslide , setImageslide] = useState([]);
   const { addItem } = useCart();
   const {
     addItem: addToWishlist,
     isInWishlist,
     removeItem: removeFromWishlist,
   } = useWishlist();
+
 
   const [currentUser, setCurrentUser] = useState<null | { uid: string }>(null);
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -58,7 +66,6 @@ const ProductDetail: React.FC = () => {
     { id: string; userId: string; content: string; rating: number; createdAt: any }[]
   >([]);
 
-  // Fetch product data
   useEffect(() => {
     if (!id) return;
     setIsLoading(true);
@@ -68,6 +75,24 @@ const ProductDetail: React.FC = () => {
       .finally(() => setIsLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    if (product) {
+      setImageslide(product.packageImages);
+      setImageslide([ product.imageUrl, ...product.packageImages ]);
+    }
+  },[product])
+
+
+  const handleAddToCart = () => product && addItem(product, quantity);
+  const handleToggleWishlist = () => {
+    if (!product) return;
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
+  };
+
   // Track auth state
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) =>
@@ -75,33 +100,7 @@ const ProductDetail: React.FC = () => {
     );
     return unsub;
   }, []);
-
-  // Fetch reviews
-  useEffect(() => {
-    if (!id) return;
-    const q = query(
-      collection(db, "reviews"),
-      where("productId", "==", id),
-      orderBy("createdAt", "desc")
-    );
-    getDocs(q)
-      .then((snap) =>
-        setReviews(
-          snap.docs.map((doc) => ({ id: doc.id, ...(doc.data() as any) }))
-        )
-      )
-      .catch(console.error);
-  }, [id, showReviewForm]);
-
-  const handleAddToCart = () => product && addItem(product, quantity);
-  const handleToggleWishlist = () => {
-    if (!product) return;
-if (isInWishlist(product.id)) {
-  removeFromWishlist(product.id);
-} else {
-  addToWishlist(product);
-}
-  };
+  
 
   const onWriteReview = () =>
     currentUser ? setShowReviewForm(true) : navigate("/login");
@@ -120,7 +119,6 @@ if (isInWishlist(product.id)) {
     setReviewRating(5);
     setShowReviewForm(false);
   };
-
 
   if (isLoading) {
     return (
@@ -145,14 +143,11 @@ if (isInWishlist(product.id)) {
       </div>
     );
   }
- 
-  //console.log(product);
 
   return (
     <div className="min-h-screen bg-noir-900 text-foreground">
       <Navbar />
       <main className="container mx-auto px-4 pt-32 pb-16">
-        {/* Breadcrumbs */}
         <nav className="flex mb-8 text-sm">
           <Link to="/" className="text-noir-400 hover:text-gold">Home</Link>
           <ChevronRight className="h-4 w-4 mx-2 text-noir-500" />
@@ -162,139 +157,87 @@ if (isInWishlist(product.id)) {
         </nav>
 
         <div className="grid lg:grid-cols-2 gap-12">
-          {/* Image + Volume */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="relative bg-noir-800 rounded-lg overflow-hidden">
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                className="w-full h-[500px] object-cover"
-              />
-              <span className="absolute top-3 right-3 bg-gold text-noir-900 text-xs font-medium px-2 py-1 rounded">
-                {product.volume}
-              </span>
-            </div>
+            {/* Carousel for product images */}
+            <Carousel className="w-full h-full max-w-xl mx-auto">
+              <CarouselContent>
+                {imageslide.map((url, index) => (
+                  <CarouselItem key={index}>
+                    <div className="p-1">
+                      <img
+                        src={url || fallbackImage}
+                        onError={(e) => (e.currentTarget.src = fallbackImage)}
+                        alt={`Product Image ${index + 1}`}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
           </motion.div>
 
-          {/* Details */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="mb-2">
-              <span className="text-noir-400 text-sm">{product.brand}</span>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-light mb-4">
-              {product.name}
-            </h1>
+            <div className="mb-2 text-noir-400 text-sm">{product.brand}</div>
+            <h1 className="text-3xl md:text-4xl font-light mb-4">{product.name}</h1>
             <div className="flex items-center mb-6">
               <div className="flex mr-2">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`h-4 w-4 ${
-                      i < product.rating ? "fill-gold text-gold" : "text-noir-600"
-                    }`}
+                    className={`h-4 w-4 ${i < product.rating ? "fill-gold text-gold" : "text-noir-600"}`}
                   />
                 ))}
               </div>
-              <span className="text-sm text-noir-300">
-                ({product.rating} rating)
-              </span>
+              <span className="text-sm text-noir-300">({product.rating} rating)</span>
             </div>
-            <div className="mb-8">
-              <span className="text-2xl text-gold">
-                PKR {product.price.toFixed(2)}
-              </span>
-            </div>
+            <div className="mb-8 text-2xl text-gold">PKR {product.price.toFixed(2)}</div>
             <p className="text-noir-200 mb-8">{product.description}</p>
             <div className="mb-6">
-              <span
-                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                  product.stock > 0
-                    ? "bg-green-900/20 text-green-500"
-                    : "bg-red-900/20 text-red-500"
-                }`}
-              >
-                {product.stock > 0
-                  ? `In Stock (${product.stock} available)`
-                  : "Out of Stock"}
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${product.stock > 0 ? "bg-green-900/20 text-green-500" : "bg-red-900/20 text-red-500"}`}>
+                {product.stock > 0 ? `In Stock (${product.stock} available)` : "Out of Stock"}
               </span>
             </div>
             <div className="mb-8">
               <label className="block text-sm mb-2">Quantity</label>
               <div className="flex items-center">
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="h-10 w-10 rounded-l-md border-r-0"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={quantity <= 1}
-                >
+                <Button size="icon" variant="outline" className="h-10 w-10 rounded-l-md border-r-0" onClick={() => setQuantity(Math.max(1, quantity - 1))} disabled={quantity <= 1}>
                   <Minus className="h-4 w-4" />
                 </Button>
-                <div className="h-10 px-4 flex items-center justify-center min-w-[50px] border bg-noir-800">
-                  {quantity}
-                </div>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="h-10 w-10 rounded-r-md border-l-0"
-                  onClick={() => setQuantity(quantity + 1)}
-                  disabled={quantity >= product.stock}
-                >
+                <div className="h-10 px-4 flex items-center justify-center min-w-[50px] border bg-noir-800">{quantity}</div>
+                <Button size="icon" variant="outline" className="h-10 w-10 rounded-r-md border-l-0" onClick={() => setQuantity(quantity + 1)} disabled={quantity >= product.stock}>
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
             </div>
             <div className="flex flex-wrap gap-4">
-              <Button
-                className="flex-1 bg-gold hover:bg-gold-dark text-noir-900"
-                onClick={handleAddToCart}
-                disabled={product.stock <= 0}
-              >
-                <ShoppingBag className="h-4 w-4 mr-2" />
-                Add to Cart
+              <Button className="flex-1 bg-gold hover:bg-gold-dark text-noir-900" onClick={handleAddToCart} disabled={product.stock <= 0}>
+                <ShoppingBag className="h-4 w-4 mr-2" />Add to Cart
               </Button>
-              <Button
-                variant="outline"
-                className={`min-w-[150px] ${
-                  isInWishlist(product.id) ? "bg-gold/10 border-gold text-gold" : ""
-                }`}
-                onClick={handleToggleWishlist}
-              >
-                <Heart
-                  className={`h-4 w-4 mr-2 ${
-                    isInWishlist(product.id) ? "fill-gold" : ""
-                  }`}
-                />
+              <Button variant="outline" className={`min-w-[150px] ${isInWishlist(product.id) ? "bg-gold/10 border-gold text-gold" : ""}`} onClick={handleToggleWishlist}>
+                <Heart className={`h-4 w-4 mr-2 ${isInWishlist(product.id) ? "fill-gold" : ""}`} />
                 {isInWishlist(product.id) ? "Wishlisted" : "Add to Wishlist"}
               </Button>
             </div>
           </motion.div>
         </div>
 
-        {/* Tabs */}
         <div className="mt-16">
           <Tabs defaultValue="details">
             <TabsList className="w-full border-b border-noir-700 bg-transparent">
-              <TabsTrigger value="details" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-gold">
-                Details
-              </TabsTrigger>
-              <TabsTrigger value="ingredients" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-gold">
-                Ingredients
-              </TabsTrigger>
-              <TabsTrigger value="reviews" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-gold">
-                Reviews
-              </TabsTrigger>
+              <TabsTrigger value="details" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-gold">Details</TabsTrigger>
+              <TabsTrigger value="reviews" className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-gold">Reviews</TabsTrigger>
             </TabsList>
-
-            {/* Details Tab */}
             <TabsContent value="details" className="py-6 space-y-4">
               <p>{product.description}</p>
               <p><strong>Category:</strong> {product.category}</p>
@@ -302,30 +245,6 @@ if (isInWishlist(product.id)) {
               <p><strong>Volume:</strong> {product.volume}</p>
               <p><strong>Stock:</strong> {product.stock}</p>
             </TabsContent>
-
-            {/* Ingredients Tab */}
-            <TabsContent value="ingredients" className="py-6 space-y-6">
-              <div>
-                <h4 className="font-medium">Top Notes</h4>
-                <ul className="list-disc list-inside">
-                  {product.topNotes.map((n, i) => <li key={i}>{n}</li>)}
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-medium">Heart Notes</h4>
-                <ul className="list-disc list-inside">
-                  {product.heartNotes.map((n, i) => <li key={i}>{n}</li>)}
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-medium">Base Notes</h4>
-                <ul className="list-disc list-inside">
-                  {product.baseNotes.map((n, i) => <li key={i}>{n}</li>)}
-                </ul>
-              </div>
-            </TabsContent>
-
-            {/* Reviews Tab */}
             <TabsContent value="reviews" className="py-6">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-medium">Customer Reviews</h3>
@@ -404,4 +323,4 @@ if (isInWishlist(product.id)) {
   );
 };
 
-export default ProductDetail;
+export default PackageDetail;

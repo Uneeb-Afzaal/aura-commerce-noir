@@ -81,10 +81,10 @@ export function HeroSection() {
             animate="visible"
             variants={fadeIn}
           >
-            <Button onClick={()=>navigate('/shop')} className="bg-gold hover:bg-gold-dark text-noir-900 px-8 py-6">
+            <Button onClick={()=>navigate('/shop')} className="bg-gold hover:bg-gold-dark font-bold text-noir-900 px-8 py-6">
               Shop Now
             </Button>
-            <Button onClick={()=>navigate('/collections')}  variant="outline" className="border-gold text-gold hover:bg-gold/10 px-8 py-6">
+            <Button onClick={()=>navigate('/collections')}  variant="outline" className="border-gold font-bold text-gold hover:bg-gold/10 px-8 py-6">
               Explore Collections <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </motion.div>

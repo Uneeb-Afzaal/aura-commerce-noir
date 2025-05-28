@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin, Phone , FacebookIcon , InstagramIcon } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,18 +16,27 @@ export function Footer() {
               Discover the art of luxury fragrance with our curated collection of premium scents for the discerning individual.
             </p>
             <div className="flex space-x-4">
-              {["facebook", "instagram", "twitter", "youtube"].map((social) => (
+              
                 <a
-                  key={social}
-                  href={`#${social}`}
+                  href='https://www.facebook.com/sufianahofficial/'
                   className="h-8 w-8 rounded-full border border-noir-600 flex items-center justify-center text-noir-300 hover:border-gold hover:text-gold"
                 >
-                  <span className="sr-only">{social}</span>
-                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                  <span className="sr-only"></span>
+                  <FacebookIcon className="h-4 w-4" />
+                  {/* <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2C6.477 2 2 6.477 2 12c0 5.523 4.477 10 10 10s10-4.477 10-10c0-5.523-4.477-10-10-10z" />
-                  </svg>
+                  </svg> */}
                 </a>
-              ))}
+                <a
+                  href='https://www.instagram.com/sufianah.official/'
+                  className="h-8 w-8 rounded-full border border-noir-600 flex items-center justify-center text-noir-300 hover:border-gold hover:text-gold"
+                >
+                  <span className="sr-only"></span>
+                  <InstagramIcon className="h-4 w-4" />
+                  {/* <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.477 2 2 6.477 2 12c0 5.523 4.477 10 10 10s10-4.477 10-10c0-5.523-4.477-10-10-10z" />
+                  </svg> */}
+                </a>
             </div>
           </div>
           

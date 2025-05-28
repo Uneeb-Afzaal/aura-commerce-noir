@@ -2,29 +2,36 @@
 import { motion } from "framer-motion";
 import fem from "@/assets/images/fem.png";
 import mal from "@/assets/images/mal.png";
+import uni from "@/assets/images/unisex.jpg";
+import { url } from "inspector";
+import { useNavigate } from "react-router-dom";
 
 const categories = [
   {
     id: "1",
     name: "For Him",
     image: mal,
+    url : "/shop?category=men",
     description: "Bold and sophisticated fragrances for the modern gentleman"
   },
   {
     id: "2",
     name: "For Her",
     image: fem,
+    url : "/shop?category=women",
     description: "Elegant and captivating scents that leave a lasting impression"
   },
   {
     id: "3",
     name: "Unisex",
-    image: "https://images.unsplash.com/photo-1617464985170-8706f2a8b39a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dW5pc2V4JTIwcGVyZnVtZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+    image: uni,
+    url : "/shop?category=unisex",
     description: "Gender-neutral fragrances for the individual who defies convention"
   },
 ];
 
 export function CategoriesSection() {
+  const navigate = useNavigate();
   return (
     <section className="py-20 bg-noir-800">
       <div className="container mx-auto px-4">
@@ -70,6 +77,7 @@ export function CategoriesSection() {
                   <h3 className="text-2xl font-medium mb-2 text-white">{category.name}</h3>
                   <p className="text-noir-100 mb-6">{category.description}</p>
                   <button 
+                    onClick={()=> navigate(category.url)}
                     className="text-gold border-b border-gold hover:border-gold-light pb-1 hover:text-gold-light transition-colors"
                   >
                     Discover More
