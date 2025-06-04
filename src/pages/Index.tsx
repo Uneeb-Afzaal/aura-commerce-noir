@@ -78,9 +78,39 @@ const Index = () => {
             </motion.div>
             
             <div className="grid md:grid-cols-3 gap-8">
-              {[1, 2, 3].map((item, index) => (
+              {[{
+                name:"Danyal Khan",
+                message:"Blue Desert is my go-to summer scent – it's crisp, clean, and lasts all day. It reminds me of ocean breeze and freedom",
+                rating:5,
+              },{
+                name:"Kahlid",
+                message:"Marjan has such a luxurious vibe! It feels like I’m wearing something truly premium. Perfect for evening wear.",
+                rating:5,
+                
+              },{
+                name:"Adeel",
+                message:"Coffico M B313 is addictive! The coffee note hits perfectly – warm and unique without being overpowering",
+                rating:5,
+                
+              },
+              {
+                name: "Hamza Jutt",
+                message:"Love how Blue Desert stays light but still makes a statement. My colleagues always ask what I’m wearing!",
+                rating:5,
+              },
+              {
+                name : "Junaid Saleem",
+                message:"Marjan is elegance in a bottle. It's floral, but grounded. I wear it when I want to feel confident and classy.",
+                rating:5,
+              },
+              {
+                name : "Mazoor Khan",
+                message:"B313 has this mysterious depth. It’s a scent that grows on you – very different from typical perfumes. A hidden gem!",
+                rating:5,
+              },
+            ].map((item, index) => (
                 <motion.div
-                  key={item}
+                  key={index}
                   className="bg-noir-800 rounded-lg p-8 border border-noir-700 relative"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -88,20 +118,20 @@ const Index = () => {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
                   <div className="absolute -top-5 left-8 bg-gold text-noir-900 w-10 h-10 flex items-center justify-center rounded-full">
-                    "
+                    {item.name.charAt(0)}
                   </div>
                   <p className="text-noir-100 mb-6 mt-3">
-                    "The fragrances from Sufianah are truly exceptional. The attention to detail in each composition is remarkable, creating scents that are both memorable and uniquely sophisticated."
+                    {item.message}
                   </p>
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-noir-600 rounded-full mr-3"></div>
                     <div>
-                      <h4 className="font-medium">Alex Thompson</h4>
+                      <h4 className="font-medium">{item.name}</h4>
                       <p className="text-sm text-noir-300">Loyal Customer</p>
                     </div>
                   </div>
                   <div className="flex mt-4">
-                    {[...Array(5)].map((_, i) => (
+                    {[...Array(item.rating)].map((_, i) => (
                       <span key={i} className="text-gold">★</span>
                     ))}
                   </div>

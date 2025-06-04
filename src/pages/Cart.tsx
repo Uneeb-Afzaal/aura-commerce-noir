@@ -12,9 +12,9 @@ const Cart = () => {
   const { items, updateQuantity, removeItem, subtotal, clearCart } = useCart();
   
   // Calculate shipping cost
-  const shippingCost = subtotal > 200 ? 0 : 10;
-  // Calculate tax (assume 10% tax rate)
-  const tax = subtotal * 0.1;
+  const shippingCost = 200;
+  // Calculate tax (assume 1% tax rate)
+  const tax = subtotal * 0.01;
   // Calculate total cost
   const total = subtotal + shippingCost + tax;
 
@@ -56,7 +56,7 @@ const Cart = () => {
                       <div key={item.id} className="flex flex-col md:flex-row gap-4 pb-6 border-b border-noir-700">
                         <div className="w-full md:w-24 h-24 bg-noir-700 rounded-md overflow-hidden">
                           <img 
-                            src={item.imageUrl} 
+                            src={item.imageUrl[0]} 
                             alt={item.name}
                             className="w-full h-full object-cover"
                           />
@@ -137,16 +137,12 @@ const Cart = () => {
                     <div className="flex justify-between">
                       <span>Shipping</span>
                       <span>
-                        {shippingCost === 0 ? (
-                          <span className="text-green-500">Free</span>
-                        ) : (
-                          `PKR ${shippingCost.toFixed(2)}`
-                        )}
+                        PKR {shippingCost.toFixed(2)}
                       </span>
                     </div>
                     
                     <div className="flex justify-between">
-                      <span>Tax (10%)</span>
+                      <span>Tax (1%)</span>
                       <span>PKR {tax.toFixed(2)}</span>
                     </div>
                     

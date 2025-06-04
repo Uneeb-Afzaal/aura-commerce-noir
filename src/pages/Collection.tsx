@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/navbar";
@@ -7,59 +7,81 @@ import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import collection1 from "@/assets/images/col1.png";
+import {getProductsByCollection} from "@/lib/product-service";
+import { Collection } from "@/types";
+import suf from "@/assets/images/suf.png";
 
 const Collections = () => {
+  const [collections, setCollections] = React.useState<Collection[]>([]);
+  const [loading, setLoading] = React.useState(true);
   // Collection categories
-  const collections = [
-    {
-      id: "signature",
-      name: "Signature Collection",
-      description: "Our most iconic fragrances that define luxury and sophistication.",
-      image: collection1,
-      products: [
-        { id: "sig1", name: "Midnight Amber", description: "Deep woody notes with amber and musk", price: 185 },
-        { id: "sig2", name: "Golden Elixir", description: "A rich blend of vanilla and sandalwood", price: 195 },
-        { id: "sig3", name: "Azure Sky", description: "Fresh citrus notes with a hint of sea breeze", price: 175 },
-        { id: "sig4", name: "Royal Oud", description: "Luxurious oud with subtle spicy undertones", price: 210 },
-      ]
-    },
-    {
-      id: "limited",
-      name: "Limited Edition",
-      description: "Exclusive fragrances created for special occasions and seasons.",
-      image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?auto=format&fit=crop&w=800&q=80",
-      products: [
-        { id: "ltd1", name: "Winter Frost", description: "Pine and cedarwood with spicy cinnamon", price: 220 },
-        { id: "ltd2", name: "Summer Breeze", description: "Coconut and tropical flowers", price: 190 },
-        { id: "ltd3", name: "Autumn Spice", description: "Warm spices with vanilla and amber", price: 205 },
-        { id: "ltd4", name: "Spring Bloom", description: "Fresh floral bouquet with green notes", price: 185 },
-      ]
-    },
-    {
-      id: "exclusive",
-      name: "Exclusive Reserve",
-      description: "Our most prestigious fragrances with the finest rare ingredients.",
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
-      products: [
-        { id: "exc1", name: "Eternal Rose", description: "Rare Damascena roses with precious oud", price: 350 },
-        { id: "exc2", name: "Noble Iris", description: "Luxurious iris with subtle woody notes", price: 320 },
-        { id: "exc3", name: "Imperial Saffron", description: "Precious saffron blend with leather and amber", price: 380 },
-        { id: "exc4", name: "Grand Vetiver", description: "Rare vetiver with citrus and spice", price: 340 },
-      ]
-    },
-    {
-      id: "travel",
-      name: "Travel Collection",
-      description: "Perfect sized fragrances for your journeys and adventures.",
-      image: "https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?auto=format&fit=crop&w=800&q=80",
-      products: [
-        { id: "trv1", name: "Mediterranean Escape", description: "Citrus and sea notes", price: 95 },
-        { id: "trv2", name: "Oriental Journey", description: "Exotic spices and sweet amber", price: 110 },
-        { id: "trv3", name: "Alpine Adventure", description: "Fresh mountain air with pine and herbs", price: 90 },
-        { id: "trv4", name: "Desert Mirage", description: "Warm sands and sweet resins", price: 100 },
-      ]
-    },
-  ];
+  // const collections = [
+  //   {
+  //     id: "signature",
+  //     name: "Signature Collection",
+  //     description: "Our most iconic fragrances that define luxury and sophistication.",
+  //     image: collection1,
+  //     products: [
+  //       { id: "sig1", name: "Midnight Amber", description: "Deep woody notes with amber and musk", price: 185 },
+  //       { id: "sig2", name: "Golden Elixir", description: "A rich blend of vanilla and sandalwood", price: 195 },
+  //       { id: "sig3", name: "Azure Sky", description: "Fresh citrus notes with a hint of sea breeze", price: 175 },
+  //       { id: "sig4", name: "Royal Oud", description: "Luxurious oud with subtle spicy undertones", price: 210 },
+  //     ]
+  //   },
+  //   {
+  //     id: "limited",
+  //     name: "Limited Edition",
+  //     description: "Exclusive fragrances created for special occasions and seasons.",
+  //     image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?auto=format&fit=crop&w=800&q=80",
+  //     products: [
+  //       { id: "ltd1", name: "Winter Frost", description: "Pine and cedarwood with spicy cinnamon", price: 220 },
+  //       { id: "ltd2", name: "Summer Breeze", description: "Coconut and tropical flowers", price: 190 },
+  //       { id: "ltd3", name: "Autumn Spice", description: "Warm spices with vanilla and amber", price: 205 },
+  //       { id: "ltd4", name: "Spring Bloom", description: "Fresh floral bouquet with green notes", price: 185 },
+  //     ]
+  //   },
+  //   {
+  //     id: "exclusive",
+  //     name: "Exclusive Reserve",
+  //     description: "Our most prestigious fragrances with the finest rare ingredients.",
+  //     image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
+  //     products: [
+  //       { id: "exc1", name: "Eternal Rose", description: "Rare Damascena roses with precious oud", price: 350 },
+  //       { id: "exc2", name: "Noble Iris", description: "Luxurious iris with subtle woody notes", price: 320 },
+  //       { id: "exc3", name: "Imperial Saffron", description: "Precious saffron blend with leather and amber", price: 380 },
+  //       { id: "exc4", name: "Grand Vetiver", description: "Rare vetiver with citrus and spice", price: 340 },
+  //     ]
+  //   },
+  //   {
+  //     id: "travel",
+  //     name: "Travel Collection",
+  //     description: "Perfect sized fragrances for your journeys and adventures.",
+  //     image: "https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?auto=format&fit=crop&w=800&q=80",
+  //     products: [
+  //       { id: "trv1", name: "Mediterranean Escape", description: "Citrus and sea notes", price: 95 },
+  //       { id: "trv2", name: "Oriental Journey", description: "Exotic spices and sweet amber", price: 110 },
+  //       { id: "trv3", name: "Alpine Adventure", description: "Fresh mountain air with pine and herbs", price: 90 },
+  //       { id: "trv4", name: "Desert Mirage", description: "Warm sands and sweet resins", price: 100 },
+  //     ]
+  //   },
+  // ];
+
+  useEffect(() => {
+    const fetchCollections = async () => {
+      const tempCollections = await getProductsByCollection();
+      setCollections(tempCollections);
+      setLoading(false);
+    };
+    fetchCollections();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <img src={suf} alt="Loading" className="animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-noir-900 text-foreground">
@@ -121,7 +143,7 @@ const Collections = () => {
                       <div className="aspect-square bg-noir-700 relative">
                         {/* Placeholder for product image */}
                         <div className="absolute inset-0 flex items-center justify-center text-noir-500">
-                          Product Image
+                          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
                         </div>
                       </div>
                       <div className="p-4">

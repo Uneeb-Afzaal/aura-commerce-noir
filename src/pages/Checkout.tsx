@@ -154,27 +154,27 @@ const Checkout = () => {
   };
   
   const handlePromoCodeApply = () => {
-    if (promoCode.toLowerCase() === "welcome10") {
-      const discountAmount = subtotal * 0.1; // 10% discount
-      setDiscount(discountAmount);
-      toast({
-        title: "Promo code applied!",
-        description: `You received a 10% discount of PKR ${discountAmount.toFixed(2)}.`,
-      });
-    } else if (promoCode.toLowerCase() === "freeship") {
-      const discountAmount = selectedShipping.price;
-      setDiscount(discountAmount);
-      toast({
-        title: "Promo code applied!",
-        description: "You received free shipping!",
-      });
-    } else {
-      toast({
-        title: "Invalid promo code",
-        description: "The promo code you entered is invalid or expired.",
-        variant: "destructive",
-      });
-    }
+    // if (promoCode.toLowerCase() === "welcome10") {
+    //   const discountAmount = subtotal * 0.1; // 10% discount
+    //   setDiscount(discountAmount);
+    //   toast({
+    //     title: "Promo code applied!",
+    //     description: `You received a 10% discount of PKR ${discountAmount.toFixed(2)}.`,
+    //   });
+    // } else if (promoCode.toLowerCase() === "freeship") {
+    //   const discountAmount = selectedShipping.price;
+    //   setDiscount(discountAmount);
+    //   toast({
+    //     title: "Promo code applied!",
+    //     description: "You received free shipping!",
+    //   });
+    // } else {
+    //   toast({
+    //     title: "Invalid promo code",
+    //     description: "The promo code you entered is invalid or expired.",
+    //     variant: "destructive",
+    //   });
+    // }
   };
   
   const handleContinueToPayment = () => {
@@ -263,7 +263,7 @@ const Checkout = () => {
     try {
       // Calculate final amounts
       const shipping = selectedShipping.price;
-      const tax = subtotal * 0.1; // 10% tax
+      const tax = subtotal * 0.01; // 1% tax
       const total = subtotal + shipping + tax - discount;
       
       // Create order items from cart items
@@ -306,7 +306,7 @@ const Checkout = () => {
   
   // Calculate totals
   const shipping = selectedShipping.price;
-  const tax = subtotal * 0.1; // 10% tax
+  const tax = subtotal * 0.01; // 1% tax
   const total = subtotal + shipping + tax - discount;
   
   return (

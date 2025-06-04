@@ -91,3 +91,12 @@ export interface PaymentMethod {
   name: string; // Display name like "Visa ending in 1234"
   icon?: string;
 }
+
+
+export interface Collection {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  products: Product[];
+}
